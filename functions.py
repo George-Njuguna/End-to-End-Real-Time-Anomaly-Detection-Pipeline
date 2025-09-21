@@ -121,13 +121,3 @@ def create_train_table( conn ):
         print("❌ ERROR Creating table transactions_test_raw : ", e)
         if conn:
             conn.rollback()
-
- # splitting the dataset into train and test 
-def split(data):
-    train_df, test_df = train_test_split(
-    data,
-    test_size=0.2,           
-    random_state=42,
-    stratify=data["Class"]      
-    )
-    return train_df , test_df
