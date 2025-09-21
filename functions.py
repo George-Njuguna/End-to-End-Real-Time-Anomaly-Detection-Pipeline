@@ -6,7 +6,8 @@ from sklearn.model_selection import train_test_split
 def feat_eng( data ):
     start_time = pd.to_datetime("2025-09-20 00:00:00")
     data["Timestamp"] = start_time + pd.to_timedelta( data["Time"], unit="s" )
-    data = data.rename( columns = {'Time' : 'Time_elapsed_sec' , 'Class' : 'Fraud'} ) 
+    data = data.rename( columns = {'Time' : 'Time_elapsed_sec' , 'Class' : 'Fraud'} )
+    return data
 
 
  # splitting the dataset into train and test 
@@ -121,3 +122,5 @@ def create_train_table( conn ):
         print("❌ ERROR Creating table transactions_test_raw : ", e)
         if conn:
             conn.rollback()
+
+ # loading the dataset 
