@@ -1,6 +1,7 @@
  # Libraries
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from psycopg2.extras import execute_values
 
  # Creating Timestamp Column
 def feat_eng(df):
@@ -131,30 +132,44 @@ def create_test_table( conn ):
             conn.rollback()
 
  # loading the dataset
- # transaction train data 
-def load_train_data(conn, df):
-    try:
-        with conn.cursor() as cur:
-            records = list(df.itertuples(index=False, name=None))
-            cur.executemany("""
-                INSERT INTO transactions_train_raw (time_seconds, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19,v20, v21, v22, v23, v24, v25, v26, v27, v28, ammount, fraud, timestamp)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
-            """, records )
-            conn.commit()
-            print("✅ Data Succesfully Loaded in transactions_train_raw")
-    except Exception as e:
-        print("❌ ERROR in Loading  transactions_train_DATA",e)
-
- # transaction test data
+ # transaction test data 
 def load_test_data(conn, df):
     try:
         with conn.cursor() as cur:
+
             records = list(df.itertuples(index=False, name=None))
-            cur.executemany("""
-                INSERT INTO transactions_train_raw (time_seconds, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19,v20, v21, v22, v23, v24, v25, v26, v27, v28, ammount, fraud, timestamp)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
-            """, records )
+            columns = ', '.join(df.columns)
+            
+            sql = f"""
+                INSERT INTO transactions_test_raw ({columns})
+                VALUES %s
+            """
+
+            # Bulk insert
+            execute_values(cur, sql, records, page_size=10000)
+
             conn.commit()
-            print("✅ Data Succesfully Loaded in transaction_test_DATA")
+            print(f"✅ Inserted {len(records)} rows into transactions_test_raw")
     except Exception as e:
-        print("❌ ERROR in Loading  transactions_test_DATA",e)
+        print("❌ ERROR in Loading transactions_test_DATA", e)
+
+ # transaction train data
+def load_train_data(conn, df):
+    try:
+        with conn.cursor() as cur:
+
+            records = list(df.itertuples(index=False, name=None))
+            columns = ', '.join(df.columns)
+
+            sql = f"""
+                INSERT INTO transactions_train_raw ({columns})
+                VALUES %s
+            """
+
+            # Bulk insert
+            execute_values(cur, sql, records, page_size=10000)
+
+            conn.commit()
+            print(f"✅ Inserted {len(records)} rows into transactions_train_raw")
+    except Exception as e:
+        print("❌ ERROR in Loading transactions_train_DATA", e)
