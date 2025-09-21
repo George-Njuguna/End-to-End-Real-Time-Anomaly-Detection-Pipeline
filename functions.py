@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 def feat_eng( data ):
     start_time = pd.to_datetime("2025-09-20 00:00:00")
     data["Timestamp"] = start_time + pd.to_timedelta( data["Time"], unit="s" )
+    data["Time"] = data['Time'].astype(int)
     data = data.rename( columns = {'Time' : 'Time_elapsed_sec' , 'Class' : 'Fraud'} )
     return data
 
