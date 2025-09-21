@@ -74,7 +74,7 @@ def create_train_table( conn ):
 
 
  # transactions_test_raw            
-def create_train_table( conn ):   
+def create_test_table( conn ):   
     try:
         with conn.cursor() as cur:
             cur.execute("""
