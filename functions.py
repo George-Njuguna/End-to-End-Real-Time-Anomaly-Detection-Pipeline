@@ -9,6 +9,17 @@ def feat_eng( data ):
     data = data.rename( columns = {'Time' : 'Time_elapsed_sec' , 'Class' : 'Fraud'} ) 
 
 
+ # splitting the dataset into train and test 
+def split(data):
+    train_df, test_df = train_test_split(
+    data,
+    test_size=0.2,           
+    random_state=42,
+    stratify=data["Class"]      
+    )
+    return train_df , test_df
+
+
  # Creating tables in postgress
  # transactions_train_raw
 def create_train_table( conn ):   
