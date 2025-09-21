@@ -5,7 +5,8 @@ from sklearn.model_selection import train_test_split
  # Creating Timestamp Column
 def feat_eng(df):
     start_time = pd.to_datetime("2025-09-20 00:00:00")
-    df["Timestamp"] = start_time + pd.to_timedelta(df["Time"], unit="s")
+    df["timestamp"] = start_time + pd.to_timedelta(df["Time"], unit="s")
+    df["timestamp"] = df["timestamp"].apply(lambda x: x.to_pydatetime())
     df["Time"] = df['Time'].astype(int)
 
     # Rename for consistency
@@ -14,14 +15,7 @@ def feat_eng(df):
         'Class': 'Fraud',
         'Amount': 'Ammount'
     })
-
-    cols = [
-        "time_seconds", "V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", 
-        "V10", "V11", "V12", "V13", "V14", "V15", "V16", "V17", "V18", "V19", "V20",
-        "V21", "V22", "V23", "V24", "V25", "V26", "V27", "V28", "Ammount", "Fraud", "Timestamp"
-    ]
-
-    return df[cols]
+    return df
 
 
 
@@ -141,13 +135,13 @@ def create_test_table( conn ):
 def load_train_data(conn, df):
     try:
         with conn.cursor() as cur:
-            records = df.to_records(index=False).tolist()
+            records = list(df.itertuples(index=False, name=None))
             cur.executemany("""
                 INSERT INTO transactions_train_raw (time_seconds, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19,v20, v21, v22, v23, v24, v25, v26, v27, v28, ammount, fraud, timestamp)
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
             """, records )
             conn.commit()
-            print("✅ Data Succesfully Loaded")
+            print("✅ Data Succesfully Loaded in transactions_train_raw")
     except Exception as e:
         print("❌ ERROR in Loading  transactions_train_DATA",e)
 
@@ -155,12 +149,12 @@ def load_train_data(conn, df):
 def load_test_data(conn, df):
     try:
         with conn.cursor() as cur:
-            records = df.to_records(index=False).tolist()
+            records = list(df.itertuples(index=False, name=None))
             cur.executemany("""
                 INSERT INTO transactions_train_raw (time_seconds, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19,v20, v21, v22, v23, v24, v25, v26, v27, v28, ammount, fraud, timestamp)
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
             """, records )
             conn.commit()
-            print("✅ Data Succesfully Loaded")
+            print("✅ Data Succesfully Loaded in transaction_test_DATA")
     except Exception as e:
         print("❌ ERROR in Loading  transactions_test_DATA",e)
