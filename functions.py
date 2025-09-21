@@ -129,30 +129,26 @@ def create_test_table( conn ):
 def load_train_data(conn, data):
     try:
         with conn.cursor() as cur:
+            records = data.to_records(index=False).tolist()
             cur.executemany("""
-                INSERT INTO transaction_train (time_seconds, timestamp, ammount, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19,v20, v21, v22, v23, v24, v25, v26, v27, v28, fraud )
+                INSERT INTO transactions_train_raw (time_seconds, timestamp, ammount, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19,v20, v21, v22, v23, v24, v25, v26, v27, v28, fraud )
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
-            """, [
-                (pl['Time_elapsed_sec'], pl['Timestamp'], pl['Ammount'], pl['V1'], pl['V2'], pl['V3'], pl['V4'], pl['V5'], pl['V6'], pl['V7'], pl['V8'], pl['V9'], pl['V10'], pl['V11'], pl['V12'], pl['V13'], pl['V14'], pl['V15'], pl['V16'], pl['V17'], pl['V18'], pl['V19'], pl['V20'], pl['V21'], pl['V22'], pl['V23'], pl['V24'], pl['V25'], pl['V26'], pl['V27'], pl['V28'], pl['Fraud'])
-                for pl in data
-            ])
+            """, records )
             conn.commit()
             print("✅ Data Succesfully Loaded")
     except Exception as e:
-        print("❌ ERROR in Loading  transaction_train_DATA",e)
+        print("❌ ERROR in Loading  transactions_train_DATA",e)
 
  # transaction test data
 def load_test_data(conn, data):
     try:
         with conn.cursor() as cur:
+            records = data.to_records(index=False).tolist()
             cur.executemany("""
-                INSERT INTO transaction_train (time_seconds, timestamp, ammount, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19,v20, v21, v22, v23, v24, v25, v26, v27, v28, fraud )
+                INSERT INTO transactions_test_raw (time_seconds, timestamp, ammount, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19,v20, v21, v22, v23, v24, v25, v26, v27, v28, fraud )
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
-            """, [
-                (pl['Time_elapsed_sec'], pl['Timestamp'], pl['Ammount'], pl['V1'], pl['V2'], pl['V3'], pl['V4'], pl['V5'], pl['V6'], pl['V7'], pl['V8'], pl['V9'], pl['V10'], pl['V11'], pl['V12'], pl['V13'], pl['V14'], pl['V15'], pl['V16'], pl['V17'], pl['V18'], pl['V19'], pl['V20'], pl['V21'], pl['V22'], pl['V23'], pl['V24'], pl['V25'], pl['V26'], pl['V27'], pl['V28'], pl['Fraud'])
-                for pl in data
-            ])
+            """, records )
             conn.commit()
             print("✅ Data Succesfully Loaded")
     except Exception as e:
-        print("❌ ERROR in Loading  transaction_test_DATA",e)
+        print("❌ ERROR in Loading  transactions_test_DATA",e)
