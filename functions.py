@@ -5,4 +5,109 @@ import pandas as pd
 def feat_eng( data ):
     start_time = pd.to_datetime("2025-09-20 00:00:00")
     data["Timestamp"] = start_time + pd.to_timedelta( data["Time"], unit="s" )
-    data = data.rename( columns = {'Time' : 'Time_elapsed_sec'} ) 
+    data = data.rename( columns = {'Time' : 'Time_elapsed_sec' , 'Class' : 'Fraud'} ) 
+
+
+ # Creating tables in postgress
+ # transactions_train_raw
+def create_train_table( conn ):   
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS transactions_train_raw (
+                    transaction_id SERIAL PRIMARY KEY,     
+                    time_seconds INT NOT NULL,              
+                    timestamp TIMESTAMP NOT NULL,           
+                    amount NUMERIC(10,2) NOT NULL,          
+                    v1 DOUBLE PRECISION,
+                    v2 DOUBLE PRECISION,
+                    v3 DOUBLE PRECISION,
+                    v4 DOUBLE PRECISION,
+                    v5 DOUBLE PRECISION,
+                    v6 DOUBLE PRECISION,
+                    v7 DOUBLE PRECISION,
+                    v8 DOUBLE PRECISION,
+                    v9 DOUBLE PRECISION,
+                    v10 DOUBLE PRECISION,
+                    v11 DOUBLE PRECISION,
+                    v12 DOUBLE PRECISION,
+                    v13 DOUBLE PRECISION,
+                    v14 DOUBLE PRECISION,
+                    v15 DOUBLE PRECISION,
+                    v16 DOUBLE PRECISION,
+                    v17 DOUBLE PRECISION,
+                    v18 DOUBLE PRECISION,
+                    v19 DOUBLE PRECISION,
+                    v20 DOUBLE PRECISION,
+                    v21 DOUBLE PRECISION,
+                    v22 DOUBLE PRECISION,
+                    v23 DOUBLE PRECISION,
+                    v24 DOUBLE PRECISION,
+                    v25 DOUBLE PRECISION,
+                    v26 DOUBLE PRECISION,
+                    v27 DOUBLE PRECISION,
+                    v28 DOUBLE PRECISION,
+                    fraud SMALLINT NOT NULL
+
+                );
+            """)
+            conn.commit()
+            print("✅ Table 'transactions_train_raw' CREATED/EXISTS).")
+    
+    except Exception as e:
+        print("❌ ERROR Creating table transactions_train_raw : ", e)
+        if conn:
+            conn.rollback()
+
+
+ # transactions_test_raw            
+def create_train_table( conn ):   
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS transactions_test_raw (
+                    transaction_id SERIAL PRIMARY KEY,     
+                    time_seconds INT NOT NULL,              
+                    timestamp TIMESTAMP NOT NULL,           
+                    amount NUMERIC(10,2) NOT NULL,          
+                    v1 DOUBLE PRECISION,
+                    v2 DOUBLE PRECISION,
+                    v3 DOUBLE PRECISION,
+                    v4 DOUBLE PRECISION,
+                    v5 DOUBLE PRECISION,
+                    v6 DOUBLE PRECISION,
+                    v7 DOUBLE PRECISION,
+                    v8 DOUBLE PRECISION,
+                    v9 DOUBLE PRECISION,
+                    v10 DOUBLE PRECISION,
+                    v11 DOUBLE PRECISION,
+                    v12 DOUBLE PRECISION,
+                    v13 DOUBLE PRECISION,
+                    v14 DOUBLE PRECISION,
+                    v15 DOUBLE PRECISION,
+                    v16 DOUBLE PRECISION,
+                    v17 DOUBLE PRECISION,
+                    v18 DOUBLE PRECISION,
+                    v19 DOUBLE PRECISION,
+                    v20 DOUBLE PRECISION,
+                    v21 DOUBLE PRECISION,
+                    v22 DOUBLE PRECISION,
+                    v23 DOUBLE PRECISION,
+                    v24 DOUBLE PRECISION,
+                    v25 DOUBLE PRECISION,
+                    v26 DOUBLE PRECISION,
+                    v27 DOUBLE PRECISION,
+                    v28 DOUBLE PRECISION,
+                    fraud SMALLINT NOT NULL
+
+                );
+            """)
+            conn.commit()
+            print("✅ Table 'transactions_test_raw' CREATED/EXISTS).")
+    
+    except Exception as e:
+        print("❌ ERROR Creating table transactions_test_raw : ", e)
+        if conn:
+            conn.rollback()
+
+    
