@@ -19,6 +19,7 @@ try:
 except Exception as e:
     print(" ERROR IN [ADDING TIMESTAMP AND CHANGING COLUMN NAMES]:", e)
 
+
  # splitting the data
 try:
     train_df, test_df = split(data)

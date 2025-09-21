@@ -30,9 +30,7 @@ def create_train_table( conn ):
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS transactions_train_raw (
                     transaction_id SERIAL PRIMARY KEY,     
-                    time_seconds INT NOT NULL,              
-                    timestamp TIMESTAMP NOT NULL,           
-                    ammount NUMERIC(10,2) NOT NULL,          
+                    time_seconds INT NOT NULL,                      
                     v1 DOUBLE PRECISION,
                     v2 DOUBLE PRECISION,
                     v3 DOUBLE PRECISION,
@@ -61,8 +59,9 @@ def create_train_table( conn ):
                     v26 DOUBLE PRECISION,
                     v27 DOUBLE PRECISION,
                     v28 DOUBLE PRECISION,
-                    fraud SMALLINT NOT NULL
-
+                    ammount NUMERIC(10,2) NOT NULL,
+                    fraud SMALLINT NOT NULL,
+                    timestamp TIMESTAMP NOT NULL
                 );
             """)
             conn.commit()
@@ -81,9 +80,7 @@ def create_test_table( conn ):
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS transactions_test_raw (
                     transaction_id SERIAL PRIMARY KEY,     
-                    time_seconds INT NOT NULL,              
-                    timestamp TIMESTAMP NOT NULL,           
-                    ammount NUMERIC(10,2) NOT NULL,          
+                    time_seconds INT NOT NULL,                      
                     v1 DOUBLE PRECISION,
                     v2 DOUBLE PRECISION,
                     v3 DOUBLE PRECISION,
@@ -112,8 +109,9 @@ def create_test_table( conn ):
                     v26 DOUBLE PRECISION,
                     v27 DOUBLE PRECISION,
                     v28 DOUBLE PRECISION,
-                    fraud SMALLINT NOT NULL
-
+                    ammount NUMERIC(10,2) NOT NULL,
+                    fraud SMALLINT NOT NULL,
+                    timestamp TIMESTAMP NOT NULL       
                 );
             """)
             conn.commit()
@@ -131,7 +129,7 @@ def load_train_data(conn, data):
         with conn.cursor() as cur:
             records = data.to_records(index=False).tolist()
             cur.executemany("""
-                INSERT INTO transactions_train_raw (time_seconds, timestamp, ammount, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19,v20, v21, v22, v23, v24, v25, v26, v27, v28, fraud )
+                INSERT INTO transactions_train_raw (time_seconds, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19,v20, v21, v22, v23, v24, v25, v26, v27, v28, ammount, fraud, timestamp)
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
             """, records )
             conn.commit()
@@ -145,7 +143,7 @@ def load_test_data(conn, data):
         with conn.cursor() as cur:
             records = data.to_records(index=False).tolist()
             cur.executemany("""
-                INSERT INTO transactions_test_raw (time_seconds, timestamp, ammount, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19,v20, v21, v22, v23, v24, v25, v26, v27, v28, fraud )
+                INSERT INTO transactions_train_raw (time_seconds, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19,v20, v21, v22, v23, v24, v25, v26, v27, v28, ammount, fraud, timestamp)
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
             """, records )
             conn.commit()
