@@ -8,6 +8,14 @@ def feat_eng( data ):
     data["Timestamp"] = start_time + pd.to_timedelta( data["Time"], unit="s" )
     data["Time"] = data['Time'].astype(int)
     data = data.rename( columns = {'Time' : 'Time_elapsed_sec' , 'Class' : 'Fraud'} )
+    cols = [
+        "Time_elapsed_sec", "V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", 
+        "V10", "V11", "V12", "V13", "V14", "V15", "V16", "V17", "V18", "V19", "V20",
+        "V21", "V22", "V23", "V24", "V25", "V26", "V27", "V28", "Amount", "Fraud", "Timestamp"
+    ]
+
+    # Reorder DataFrame
+    data = data[cols]
     return data
 
 
