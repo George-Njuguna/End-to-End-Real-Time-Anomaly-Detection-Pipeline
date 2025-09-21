@@ -42,8 +42,8 @@ try:
     create_test_table(conn)
     
     # Loading The Data
-    load_test_data(conn, train_df)
-    load_train_data(conn, test_df)
+    load_test_data(conn, test_df)
+    load_train_data(conn, train_df)
 
 except Exception as e:
     print("❌ ERROR:", e)
