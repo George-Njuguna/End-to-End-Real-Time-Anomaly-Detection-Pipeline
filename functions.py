@@ -3,31 +3,37 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
  # Creating Timestamp Column
-def feat_eng( data ):
+def feat_eng(df):
     start_time = pd.to_datetime("2025-09-20 00:00:00")
-    data["Timestamp"] = start_time + pd.to_timedelta( data["Time"], unit="s" )
-    data["Time"] = data['Time'].astype(int)
-    data = data.rename( columns = {'Time' : 'Time_elapsed_sec' , 'Class' : 'Fraud'} )
-    cols = [
-        "Time_elapsed_sec", "V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", 
-        "V10", "V11", "V12", "V13", "V14", "V15", "V16", "V17", "V18", "V19", "V20",
-        "V21", "V22", "V23", "V24", "V25", "V26", "V27", "V28", "Amount", "Fraud", "Timestamp"
-    ]
+    df["Timestamp"] = start_time + pd.to_timedelta(df["Time"], unit="s")
+    df["Time"] = df['Time'].astype(int)
 
-    # Reorder DataFrame
-    data = data[cols]
-    return data
+    # Rename for consistency
+    #data = data.rename(columns={
+       #'Time': 'time_seconds',
+        #'Class': 'Fraud',
+        #'Amount': 'Ammount'
+    #})
+
+    #cols = [
+        #"time_seconds", "V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", 
+        #"V10", "V11", "V12", "V13", "V14", "V15", "V16", "V17", "V18", "V19", "V20",
+        #"V21", "V22", "V23", "V24", "V25", "V26", "V27", "V28", "Ammount", "Fraud", "Timestamp"
+    #]
+
+    return df#[cols]
+
 
 
  # splitting the dataset into train and test 
-def split(data):
-    train_df, test_df = train_test_split(
-        data,
+def split(df):
+    tr_df, te_df = train_test_split(
+        df,
         test_size=0.2,           
         random_state=42,
-        stratify=data["Fraud"]
+        stratify=df["Fraud"]
     )
-    return train_df , test_df
+    return tr_df , te_df
 
 
  # Creating tables in postgress
@@ -132,10 +138,10 @@ def create_test_table( conn ):
 
  # loading the dataset
  # transaction train data 
-def load_train_data(conn, data):
+def load_train_data(conn, df):
     try:
         with conn.cursor() as cur:
-            records = data.to_records(index=False).tolist()
+            records = df.to_records(index=False).tolist()
             cur.executemany("""
                 INSERT INTO transactions_train_raw (time_seconds, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19,v20, v21, v22, v23, v24, v25, v26, v27, v28, ammount, fraud, timestamp)
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
@@ -146,10 +152,10 @@ def load_train_data(conn, data):
         print("❌ ERROR in Loading  transactions_train_DATA",e)
 
  # transaction test data
-def load_test_data(conn, data):
+def load_test_data(conn, df):
     try:
         with conn.cursor() as cur:
-            records = data.to_records(index=False).tolist()
+            records = df.to_records(index=False).tolist()
             cur.executemany("""
                 INSERT INTO transactions_train_raw (time_seconds, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19,v20, v21, v22, v23, v24, v25, v26, v27, v28, ammount, fraud, timestamp)
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
