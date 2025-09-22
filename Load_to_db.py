@@ -11,7 +11,7 @@ load_dotenv()
 try:
     DATA = pd.read_csv('creditcard.csv')
 except Exception as e:
-    print(" ERROR IN LOADING DATA:", e)
+    print(" ERROR IN READING CSV FILE:", e)
 
  # feature engineering
 try:
