@@ -47,7 +47,7 @@ try:
     load_train_data(conn, train_df)
 
 except Exception as e:
-    print("❌ ERROR:", e)
+    print("❌ ERROR IN LOADING PIPELINE:", e)
     if conn:
         conn.rollback()
 finally:
@@ -56,7 +56,7 @@ finally:
         print("🔌 CONNECTION CLOSED")
 
 def main():
-    print("✅✅ COMPLETED LOADING THE DATASET TO POSTGRESS")
+    print("END OF THE LOADING PIPELINE")
     
 if __name__ == '__main__':
     main()
