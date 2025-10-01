@@ -190,6 +190,7 @@ def split_func(data):
     try:
         X = data.iloc[ :,2:-2 ]
         y = data.iloc[ :,-2 ]
+        return X, y
     except Exception as e:
         print(" ERROR : COULD NOT SPLIT TO VARIABLES : ", e)
 
