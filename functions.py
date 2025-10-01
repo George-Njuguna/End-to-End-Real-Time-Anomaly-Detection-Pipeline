@@ -184,3 +184,12 @@ def import_data(table_name, engine):
         return data
     except Exception as e:
             print(" ERROR : COULD NOT LOAD DATA FROM DATABASE : ", e)
+
+ # splitting data to independent and dependent variables
+def split_func(data):
+    try:
+        X = data.iloc[ :,2:-2 ]
+        y = data.iloc[ :,-2 ]
+    except Exception as e:
+        print(" ERROR : COULD NOT SPLIT TO VARIABLES : ", e)
+
