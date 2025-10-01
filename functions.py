@@ -2,6 +2,8 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from psycopg2.extras import execute_values
+from sqlalchemy import create_engine
+from dotenv import load_dotenv
 
  # Creating Timestamp Column
 def feat_eng(df):
@@ -173,3 +175,12 @@ def load_train_data(conn, df):
             print(f"✅ Inserted {len(records)} rows into transactions_train_raw")
     except Exception as e:
         print("❌ ERROR in Loading transactions_train_DATA", e)
+
+ # Importing data from postgres
+def import_data(table_name, engine):
+    try:
+        data = pd.read_sql(f"SELECT * FROM {table_name}", engine)
+        print(" DATA SUCCESFULLY LOADED ")
+        return data
+    except Exception as e:
+            print(" ERROR : COULD NOT LOAD DATA FROM DATABASE : ", e)
