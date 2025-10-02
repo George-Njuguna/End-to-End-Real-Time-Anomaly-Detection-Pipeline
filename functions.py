@@ -2,8 +2,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from psycopg2.extras import execute_values
-from sqlalchemy import create_engine
-from dotenv import load_dotenv
+
 
  # Loading CSV file
 def load_csv(filepath):
@@ -102,7 +101,7 @@ def split_func(df):
     -------
     df : Dataframe
     """ 
-    
+
     try:
         X = df.iloc[ :,2:-2 ]
         y = df.iloc[ :,-2 ]
