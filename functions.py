@@ -5,8 +5,48 @@ from psycopg2.extras import execute_values
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
 
+ # Loading CSV file
+def load_csv(filepath):
+    assert isinstance(filepath, str), 'Strings only!'
+    """
+    reads a csv file in the same directory.
+
+    Parameters
+    ----------
+    : str.
+
+    Returns
+    -------
+    df : Dataframe
+    """
+
+    try:
+        data = pd.read_csv(filepath)
+        print('read csv')
+        return data
+    except Exception as e:
+        print(" ERROR IN READING CSV FILE:", e)
+
+
+
+
  # Creating Timestamp Column
 def feat_eng(df):
+    assert isinstance(df, pd.DataFrame), 'Dataframe Only!'
+    """ 
+        Creates column Timestamp.
+        Changes Time column to an int.
+        Renames columns Time , Class and Amount 
+
+    Parameters
+    ----------
+    df : pandas.DataFrame.
+
+    Returns
+    -------
+    df : Dataframe
+    """
+    
     start_time = pd.to_datetime("2025-09-20 00:00:00")
     df["timestamp"] = start_time + pd.to_timedelta(df["Time"], unit="s")
     df["timestamp"] = df["timestamp"].apply(lambda x: x.to_pydatetime())
@@ -22,8 +62,23 @@ def feat_eng(df):
 
 
 
+
  # splitting the dataset into train and test 
 def split(df):
+    assert isinstance(df, pd.DataFrame), 'Dataframe Only!'
+    """ 
+    Splits the data into train and Test sets
+
+    Parameters
+    ----------
+    df : pandas.DataFrame.
+
+    Returns
+    -------
+    tuple
+        (tr_df, te_df)  
+    """
+    
     tr_df, te_df = train_test_split(
         df,
         test_size=0.2,           
@@ -33,9 +88,39 @@ def split(df):
     return tr_df , te_df
 
 
+ # splitting data to independent and dependent variables
+def split_func(df):
+    assert isinstance(df, pd.DataFrame), 'Dataframe Only!'
+    """
+     Splits the data into Dependant and independent Variables 
+
+    Parameters
+    ----------
+    df : pandas.DataFrame.
+
+    Returns
+    -------
+    df : Dataframe
+    """ 
+    
+    try:
+        X = df.iloc[ :,2:-2 ]
+        y = df.iloc[ :,-2 ]
+        return X, y
+    except Exception as e:
+        print(" ERROR : COULD NOT SPLIT TO VARIABLES : ", e)
+
+
  # Creating tables in postgress
  # transactions_train_raw
-def create_train_table( conn ):   
+def create_train_table( conn ):  
+    """    
+    Creates transactions_train_raw table if it doesnt exist
+
+    Parameters
+    ----------
+    conn : connection to the dataframe 
+    """
     try:
         with conn.cursor() as cur:
             cur.execute("""
@@ -86,6 +171,13 @@ def create_train_table( conn ):
 
  # transactions_test_raw            
 def create_test_table( conn ):   
+    """
+    Creates transactions_test_raw table if it doesnt exist
+
+    Parameters
+    ----------
+    conn : connection to the dataframe 
+    """
     try:
         with conn.cursor() as cur:
             cur.execute("""
@@ -136,6 +228,14 @@ def create_test_table( conn ):
  # loading the dataset
  # transaction test data 
 def load_test_data(conn, df):
+    """    
+    Loads the Data in the newly created create_test_table
+
+    Parameters
+    ----------
+    conn : connection to the Database
+    df : pd.Dataframe containing the data to be loaded
+    """
     try:
         with conn.cursor() as cur:
 
@@ -157,6 +257,14 @@ def load_test_data(conn, df):
 
  # transaction train data
 def load_train_data(conn, df):
+    """
+    Loads the Data in the newly created create_test_table
+
+    Parameters
+    ----------
+    conn : connection to the Database
+    df : pd.Dataframe containing the data to be loaded
+    """
     try:
         with conn.cursor() as cur:
 
@@ -178,19 +286,24 @@ def load_train_data(conn, df):
 
  # Importing data from postgres
 def import_data(table_name, engine):
+    """    
+    Imports the data from postgress
+    
+    Parameters
+    ----------
+    table_name : name of the table in the database
+    engine : connection to the dataframe 
+
+    Returns
+    -------
+    df : pd.Dataframe
+    """
     try:
-        data = pd.read_sql(f"SELECT * FROM {table_name}", engine)
+        df = pd.read_sql(f"SELECT * FROM {table_name}", engine)
         print(" DATA SUCCESFULLY LOADED ")
-        return data
+        return df
     except Exception as e:
             print(" ERROR : COULD NOT LOAD DATA FROM DATABASE : ", e)
 
- # splitting data to independent and dependent variables
-def split_func(data):
-    try:
-        X = data.iloc[ :,2:-2 ]
-        y = data.iloc[ :,-2 ]
-        return X, y
-    except Exception as e:
-        print(" ERROR : COULD NOT SPLIT TO VARIABLES : ", e)
+
 
