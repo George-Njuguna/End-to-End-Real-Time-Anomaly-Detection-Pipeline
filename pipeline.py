@@ -43,7 +43,7 @@ def modeling_pipe(data):
 
         param_grid = [
             {'clf__penalty':[ 'l2', None],
-            'clf__C' : [0.1,1,10],
+            'clf__C' : [0.01,0.1,1,10,100],
             'clf__solver': ['lbfgs']
         }
         ]
@@ -79,10 +79,13 @@ def modeling_pipe(data):
         f1 = f1_score(y_test, y_pred1)
         report = classification_report(y_test, y_pred1, output_dict=True)
         report_df = pd.DataFrame(report).transpose()
-
+        Best_Parameters = grid.best_params_
+        
+        print('****CLASSIFICATION REPORT*****')
         print(report_df)
+        print('Best Parameters : ', Best_Parameters)
 
-        return precision, recall, f1 
+        return precision, recall, f1, Best_Parameters
     
     except Exception as e:
         print(" ERROR : IN THE MODELLING PIPELINE : ", e)
