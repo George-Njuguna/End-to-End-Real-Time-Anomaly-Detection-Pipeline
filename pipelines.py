@@ -3,20 +3,80 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline as pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import ParameterGrid
-from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV, cross_validate
-from sklearn.metrics import  confusion_matrix , precision_score , recall_score , f1_score, classification_report
+from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV
+from sklearn.metrics import  precision_score , recall_score , f1_score, classification_report
 from dotenv import load_dotenv
-from tqdm.notebook import tqdm
+import psycopg2
 import pandas as pd
-import numpy as np
 import os
-from functions import split_func
+from functions import split_func, create_train_table, create_test_table, load_test_data,load_train_data
+
+load_dotenv()
+
+# LOADING DATA TO POSTGRESS PIPELINE 
+def load_to_postgress(train_df, test_df):
+    assert isinstance(train_df, pd.DataFrame), 'Dataframe Only!'
+    assert isinstance(test_df, pd.DataFrame), 'Dataframe Only!'
+
+    """
+    Creates Train and Test Tables if they dont exist
+    Loads  Data in the Created tables    
+
+    Parameters
+    ----------
+    train_df : pd.DataFrame 
+    test_df : pd.DataFrame
+    """
+
+    try:
+        # connecting to the database
+        conn = psycopg2.connect(
+            dbname=os.getenv('database'),
+            user=os.getenv('user'),
+            password=os.getenv('password'),
+            host = os.getenv('host'),
+            port=os.getenv('port')
+        )
+        print('✅ Connection made')
+
+        # Checking if the tables Exist/Creating The Tables
+        create_train_table(conn)
+        create_test_table(conn)
+        
+        # Loading The Data
+        load_test_data(conn, test_df)
+        load_train_data(conn, train_df)
+
+    except Exception as e:
+        print("❌ ERROR IN LOADING PIPELINE:", e)
+        if conn:
+            conn.rollback()
+    finally:
+        if conn:
+            conn.close()
+            print("🔌 CONNECTION CLOSED")
 
 
-# Modeling pipeline 
+
+# MODELLING PIPELINE
 def modeling_pipe(data):
-    
-    # splitting variables(dependent, independent)
+
+    """    
+    Models the data using Logistic Regression 
+    Optimizes using grid search 
+    Gets the best parameters
+    prints Classification Report
+
+    Parameters
+    ----------
+    data = pd.DataFrame
+
+    Returns
+    -------
+    precision, Recall, f1, Best_Parameters
+    """
+
+     # splitting variables(dependent, independent)
     X, y = split_func(data)
 
      # Splitting the dataset(train, test)
@@ -24,7 +84,6 @@ def modeling_pipe(data):
     X, y, test_size=0.2, random_state=42
     )
     try:
-        # modelling
         # Scalling ammount column
         scaled_col = ['ammount']
 
@@ -42,7 +101,7 @@ def modeling_pipe(data):
         ])
 
         param_grid = [
-            {'clf__penalty':[ 'l2', None],
+            {'clf__penalty':['l2'],
             'clf__C' : [0.01,0.1,1,10,100],
             'clf__solver': ['lbfgs']
         }
@@ -57,16 +116,12 @@ def modeling_pipe(data):
             scoring = 'f1',
             cv = skf,
             n_jobs = 1,
-            verbose = 0
+            verbose = 1
 
         )
 
-        param_list = list(ParameterGrid(param_grid))
-
-        print("Running GridSearchCV with progress bar...")
-        for params in tqdm(param_list, desc="GridSearch Progress"):
-            grid.set_params(param_grid={k: [v] for k, v in params.items()})
-            grid.fit(X_train, y_train)
+        print("Running GridSearchCV...")
+        grid.fit(X_train, y_train)
 
 
         # Evaluation

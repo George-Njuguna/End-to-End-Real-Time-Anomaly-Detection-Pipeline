@@ -8,7 +8,7 @@ from psycopg2.extras import execute_values
 def load_csv(filepath):
     assert isinstance(filepath, str), 'Strings only!'
     """
-    reads a csv file in the same directory.
+    Reads a csv file in the same directory.
 
     Parameters
     ----------
