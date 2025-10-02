@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/0/94b529b1cc374e26a8d3c4e4699208cb/artifacts
+end_time: 1759410309589
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 94b529b1cc374e26a8d3c4e4699208cb
+run_name: shivering-sow-853
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1759410309038
+status: 4
+tags: []
+user_id: agentf
