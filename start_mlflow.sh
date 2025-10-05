@@ -1,3 +1,5 @@
+#!/bin/bash
+
 source .env 
 
 BACKEND_URI="postgresql+psycopg2://${mlflow_user}@${host}:{port}/${mlflow_database}"
