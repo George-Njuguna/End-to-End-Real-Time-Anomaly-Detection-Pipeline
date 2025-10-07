@@ -16,7 +16,7 @@ engine = create_engine(
 train_data = import_data('transactions_train_raw', engine )
 
  # Training the model
-precision, recall, f1_score, parameters = modeling_pipe(train_data)
+precision, recall, f1_score, parameters = modeling_pipe(train_data, True)
 
 
 def main():
