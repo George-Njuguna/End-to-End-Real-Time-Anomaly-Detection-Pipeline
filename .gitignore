@@ -3,4 +3,4 @@
 *.txt
 *.zip
 .env
-__pychance__
+__pycache__/
