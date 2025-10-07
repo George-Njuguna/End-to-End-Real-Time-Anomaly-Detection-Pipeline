@@ -101,12 +101,13 @@ def modeling_pipe(data, imbalance_handling):
 
         # pipeline
         if imbalance_handling == False:
-
+            print("Modelling without Handling Imbalance.....")
             pipe = pipeline([
                 ('processor', processor),
                 ('clf', LogisticRegression( max_iter=1000 ))
             ])
         else:
+            print("Handling Imbalance with SMOTE......")
             pipe = smtpipeline([
             ('processor', processor),
             ('smote', SMOTE(random_state = 42)),
