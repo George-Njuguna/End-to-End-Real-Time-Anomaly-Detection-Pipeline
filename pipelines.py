@@ -3,6 +3,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline as pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import ParameterGrid
+from imblearn.over_sampling import SMOTE
+from imblearn.pipeline import Pipeline as smtpipeline
 from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV
 from sklearn.metrics import  precision_score , recall_score , f1_score, classification_report
 from dotenv import load_dotenv
@@ -59,7 +61,9 @@ def load_to_postgress(train_df, test_df):
 
 
 # MODELLING PIPELINE
-def modeling_pipe(data):
+def modeling_pipe(data, imbalance_handling):
+    assert isinstance(data, pd.DataFrame), 'Dataframe Only!'
+    assert isinstance(imbalance_handling, bool), "Input 'imbalance_handling' must be either True or False!"
 
     """    
     Models the data using Logistic Regression 
@@ -96,8 +100,16 @@ def modeling_pipe(data):
         )
 
         # pipeline
-        pipe = pipeline([
+        if imbalance_handling == False:
+
+            pipe = pipeline([
+                ('processor', processor),
+                ('clf', LogisticRegression( max_iter=1000 ))
+            ])
+        else:
+            pipe = smtpipeline([
             ('processor', processor),
+            ('smote', SMOTE(random_state = 42)),
             ('clf', LogisticRegression( max_iter=1000 ))
         ])
 
