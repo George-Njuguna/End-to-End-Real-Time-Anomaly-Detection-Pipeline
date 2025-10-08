@@ -1,4 +1,4 @@
-from Model import model1, model2
+from first_run import model1, model2
 import mlflow
 import mlflow.sklearn
 from mlflow.models.signature import infer_signature
