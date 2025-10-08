@@ -6,7 +6,7 @@ from sklearn.model_selection import ParameterGrid
 from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline as smtpipeline
 from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV
-from sklearn.metrics import  precision_score , recall_score , f1_score, classification_report
+from sklearn.metrics import  precision_score , recall_score , f1_score, classification_report, confusion_matrix
 from dotenv import load_dotenv
 import psycopg2
 import pandas as pd
@@ -62,8 +62,12 @@ def load_to_postgress(train_df, test_df):
 
 # MODELLING PIPELINE
 def modeling_pipe(data, imbalance_handling):
-    assert isinstance(data, pd.DataFrame), 'Dataframe Only!'
-    assert isinstance(imbalance_handling, bool), "Input 'imbalance_handling' must be either True or False!"
+    
+    if not isinstance(data, pd.DataFrame):
+        raise ValueError("Input 'data' must be a pandas DataFrame!")
+
+    if not isinstance(imbalance_handling, bool):
+        raise ValueError("Input 'imbalance_handling' must be either True or False (boolean type)!")
 
     """    
     Models the data using Logistic Regression 
@@ -77,7 +81,7 @@ def modeling_pipe(data, imbalance_handling):
 
     Returns
     -------
-    precision, Recall, f1, Best_Parameters
+    precision, Recall, f1, classification_report, best_model, Best_Parameters
     """
 
      # splitting variables(dependent, independent)
@@ -139,22 +143,19 @@ def modeling_pipe(data, imbalance_handling):
 
 
         # Evaluation
-        best_model1= grid.best_estimator_
+        best_model= grid.best_estimator_
 
-        y_pred1 = best_model1.predict(X_test)
+        y_pred = best_model.predict(X_test)
 
-        precision = precision_score(y_test, y_pred1)
-        recall = recall_score(y_test, y_pred1)
-        f1 = f1_score(y_test, y_pred1)
-        report = classification_report(y_test, y_pred1, output_dict=True)
-        report_df = pd.DataFrame(report).transpose()
+        precision = precision_score(y_test, y_pred)
+        recall = recall_score(y_test, y_pred)
+        f1 = f1_score(y_test, y_pred)
+        class_report = classification_report(y_test, y_pred, output_dict=True)
+        cm = confusion_matrix(y_test, y_pred)
         Best_Parameters = grid.best_params_
         
-        print('****CLASSIFICATION REPORT*****')
-        print(report_df)
-        print('Best Parameters : ', Best_Parameters)
 
-        return precision, recall, f1, Best_Parameters
+        return precision, recall, f1, class_report, best_model, Best_Parameters, cm
     
     except Exception as e:
         print(" ERROR : IN THE MODELLING PIPELINE : ", e)
