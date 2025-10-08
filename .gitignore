@@ -4,3 +4,6 @@
 *.zip
 .env
 __pycache__/
+*.png
+mlruns
+mlartifacts

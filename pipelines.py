@@ -138,7 +138,7 @@ def modeling_pipe(data, imbalance_handling):
             scoring = 'f1',
             cv = skf,
             n_jobs = 1,
-            verbose = 1
+            verbose = 2
 
         )
 

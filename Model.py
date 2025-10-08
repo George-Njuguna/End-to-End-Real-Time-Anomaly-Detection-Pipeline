@@ -42,11 +42,21 @@ with mlflow.start_run( run_name = f"Logistic_without_smote_{timestamp}" ) as run
     mlflow.log_metric('Recall', model1[1])
     mlflow.log_metric('F1 Score', model1[2])
 
+    mlflow.log_params(model1[5])
+
     mlflow.set_tag("dataset_version", "v1")
     mlflow.set_tag("Imbalance Handling", "None")
     mlflow.set_tag("Trained_at", f"{timestamp}")
 
-    cm = model1[5]
+    
+    report = model1[3]
+
+    with open("classification_report.txt", "w") as f:
+        f.write(report)
+
+    mlflow.log_artifact("classification_report.txt")
+
+    cm = model1[6]
     
     plt.figure(figsize=(6, 5))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
@@ -62,20 +72,29 @@ with mlflow.start_run( run_name = f"Logistic_without_smote_{timestamp}" ) as run
 
 with mlflow.start_run( run_name = f"Logistic_with_smote_{timestamp}" ) as run:
     mlflow.sklearn.log_model(
-        sk_model = model1[4],
+        sk_model = model2[4],
         artifact_path = "fraud_model",
         registered_model_name= "fraud_detection"
     )
 
-    mlflow.log_metric('Precision', model1[0])
-    mlflow.log_metric('Recall', model1[1])
-    mlflow.log_metric('F1 Score', model1[2])
+    mlflow.log_metric('Precision', model2[0])
+    mlflow.log_metric('Recall', model2[1])
+    mlflow.log_metric('F1 Score', model2[2])
+
+    mlflow.log_params(model2[5])
 
     mlflow.set_tag("dataset_version", "v1")
     mlflow.set_tag("Imbalance Handling", "None")
     mlflow.set_tag("Trained_at", f"{timestamp}")
 
-    cm = model1[5]
+    report = model2[3]
+
+    with open("classification_report.txt", "w") as f:
+        f.write(report)
+
+    mlflow.log_artifact("classification_report.txt")
+
+    cm = model2[6]
     
     plt.figure(figsize=(6, 5))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
