@@ -17,11 +17,15 @@ load_dotenv()
 
 # LOADING DATA TO POSTGRESS PIPELINE 
 def load_to_postgress(train_df, test_df):
-    assert isinstance(train_df, pd.DataFrame), 'Dataframe Only!'
-    assert isinstance(test_df, pd.DataFrame), 'Dataframe Only!'
+
+    if not isinstance(train_df, pd.DataFrame):
+        raise ValueError("Input 'train_df' must be a pandas DataFrame!")
+    
+    if not isinstance(test_df, pd.DataFrame):
+        raise ValueError("Input 'test_df' must be a pandas DataFrame!")
 
     """
-    Creates Train and Test Tables if they dont exist
+    Creates Train and Test Tables in postgres if they dont exist
     Loads  Data in the Created tables    
 
     Parameters
@@ -62,7 +66,7 @@ def load_to_postgress(train_df, test_df):
 
 # MODELLING PIPELINE
 def modeling_pipe(data, imbalance_handling):
-    
+
     if not isinstance(data, pd.DataFrame):
         raise ValueError("Input 'data' must be a pandas DataFrame!")
 
