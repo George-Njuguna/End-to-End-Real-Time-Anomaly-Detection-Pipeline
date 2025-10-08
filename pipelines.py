@@ -154,7 +154,7 @@ def modeling_pipe(data, imbalance_handling):
         precision = precision_score(y_test, y_pred)
         recall = recall_score(y_test, y_pred)
         f1 = f1_score(y_test, y_pred)
-        class_report = classification_report(y_test, y_pred, output_dict=True)
+        class_report = classification_report(y_test, y_pred, target_names=["No Fraud", "Fraud"])
         cm = confusion_matrix(y_test, y_pred)
         Best_Parameters = grid.best_params_
         
