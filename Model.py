@@ -16,13 +16,13 @@ engine = create_engine(
 train_data = import_data('transactions_train_raw', engine )
 
  # Training the model
-precision, recall, f1_score, parameters = modeling_pipe(train_data, False)
+model1 = modeling_pipe(train_data, False)
 
-precision1, recall2, f1_score3, parameters4 = modeling_pipe(train_data, True)
+model2 = modeling_pipe(train_data, True)
 
 
 def main():
-    print("END OF THE MODELLING PIPELINE")
+    print("END OF THE MODELLING")
     
 if __name__ == '__main__':
     main()
