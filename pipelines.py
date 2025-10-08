@@ -157,8 +157,8 @@ def modeling_pipe(data, imbalance_handling):
         class_report = classification_report(y_test, y_pred, target_names=["No Fraud", "Fraud"])
         cm = confusion_matrix(y_test, y_pred)
         Best_Parameters = grid.best_params_
-        
-        
+        print("COMPLETED MODELLING....")
+
         return precision, recall, f1, class_report, best_model, Best_Parameters, cm
     
     except Exception as e:
