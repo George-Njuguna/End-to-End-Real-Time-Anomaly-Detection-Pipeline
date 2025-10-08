@@ -34,6 +34,7 @@ def mlflow_pipe(model_info, imbalance_handling):
                 mlflow.set_tag("Imbalance Handling", "SMOTE")
 
             mlflow.set_tag("Trained_at", f"{timestamp}")
+            mlflow.set_tag("domain", "fraud")
 
             
             report = model_info[3]
