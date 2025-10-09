@@ -76,6 +76,7 @@ def modeling_pipe(data, imbalance_handling):
     """    
     Models the data using Logistic Regression 
     Optimizes using grid search 
+    if imbalance_handling true uses SMOTE else none
     Gets the best parameters
     prints Classification Report
 
