@@ -166,7 +166,7 @@ def modeling_pipe(data, imbalance_handling):
             "classification_report":class_report,
             "model":best_model,
             "parameters":Best_Parameters,
-            'confussion_matrix':cm
+            'confusion_matrix':cm
         }
     
     
