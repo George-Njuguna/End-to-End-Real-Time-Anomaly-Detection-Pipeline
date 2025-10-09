@@ -5,15 +5,26 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import seaborn as sns
 
-mlflow.set_tracking_uri( uri = "http://127.0.0.1:5000" )
-#mlflow.set_tracking_uri( os.getenv('tracking_uri') )
-mlflow.set_experiment("Fraud_Detection_test")
 
 timestamp = datetime.now().strftime( "%Y-%m-%d" )
 
-def mlflow_pipe(model_info, imbalance_handling):
+def mlflow_pipe(model_info, tracking_uri,experiment, imbalance_handling):
+    if not isinstance(model_info, dict):
+        raise ValueError("Input 'model_info' must be a dictonary")
 
+    if not isinstance(imbalance_handling, bool):
+        raise ValueError("Input 'imbalance_handling' must be either True or False (boolean type)!")
+    
+    if not isinstance(tracking_uri, str):
+        raise ValueError("Input 'tracking_uri' must be a string value representing the uri")
+    
+    if not isinstance(experiment, str):
+        raise ValueError("Input 'experiment' must be a string representing the experiment name")
+    
     try:
+        mlflow.set_tracking_uri( uri = tracking_uri )
+        mlflow.set_experiment(experiment)
+
         with mlflow.start_run( run_name = f"Logistic_model{timestamp}" ) as run:
             mlflow.sklearn.log_model(
                 sk_model = model_info[4],
