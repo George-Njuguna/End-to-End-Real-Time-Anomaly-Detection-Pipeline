@@ -85,7 +85,7 @@ def modeling_pipe(data, imbalance_handling):
 
     Returns
     -------
-    precision, Recall, f1, classification_report, best_model, Best_Parameters
+    a dictonary that contains precision, Recall, f1, classification_report, best_model, Best_Parameters
     """
 
      # splitting variables(dependent, independent)
@@ -159,7 +159,17 @@ def modeling_pipe(data, imbalance_handling):
         Best_Parameters = grid.best_params_
         print("COMPLETED MODELLING....")
 
-        return precision, recall, f1, class_report, best_model, Best_Parameters, cm
+        return {
+            "precision":precision,
+            "recall":recall,
+            "f1_score":f1,
+            "classification_report":class_report,
+            "model":best_model,
+            "parameters":Best_Parameters,
+            'confussion_matrix':cm
+        }
+    
+    
     
     except Exception as e:
         print(" ERROR : IN THE MODELLING PIPELINE : ", e)
