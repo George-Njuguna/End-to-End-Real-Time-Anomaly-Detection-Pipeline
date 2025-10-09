@@ -8,7 +8,7 @@ import seaborn as sns
 
 timestamp = datetime.now().strftime( "%Y-%m-%d" )
 
-def mlflow_pipe(model_info, tracking_uri,experiment, imbalance_handling):
+def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling):
 
     if not isinstance(model_info, dict):
         raise ValueError("Input 'model_info' must be a dictonary what is returned after 'modelling_pipe'")
@@ -19,12 +19,12 @@ def mlflow_pipe(model_info, tracking_uri,experiment, imbalance_handling):
     if not isinstance(tracking_uri, str):
         raise ValueError("Input 'tracking_uri' must be a string value representing the uri")
     
-    if not isinstance(experiment, str):
-        raise ValueError("Input 'experiment' must be a string representing the experiment name")
+    if not isinstance(experiment_name, str):
+        raise ValueError("Input 'experiment_name' must be a string representing the experiment name")
     
     try:
         mlflow.set_tracking_uri( uri = tracking_uri )
-        mlflow.set_experiment(experiment)
+        mlflow.set_experiment(experiment_name)
 
         with mlflow.start_run( run_name = f"Logistic_model{timestamp}" ) as run:
             mlflow.sklearn.log_model(
