@@ -22,6 +22,18 @@ def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling):
     if not isinstance(experiment_name, str):
         raise ValueError("Input 'experiment_name' must be a string representing the experiment name")
     
+    """    
+    logs model , parameters metrics and artifacts to mlflow
+
+    Parameters
+    ----------
+    model_info : dict that is returned after running the modelling pipeline model_pipe
+    tracking_uri : str , tracking uri of mlflow
+    experiment_name : str name of the experiment being loaded to mlflow
+    imbalance_handling : bool true repin model that used smote and vice versa
+    
+    """
+    
     try:
         mlflow.set_tracking_uri( uri = tracking_uri )
         mlflow.set_experiment(experiment_name)
