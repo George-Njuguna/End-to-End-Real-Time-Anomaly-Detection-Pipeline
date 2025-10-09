@@ -5,8 +5,9 @@ from psycopg2.extras import execute_values
 
 
  # Loading CSV file
-def load_csv(filepath):
-    assert isinstance(filepath, str), 'Strings only!'
+def load_csv(file_path):
+    if not isinstance(file_path, str):
+        raise ValueError("Input 'file_path' should be a file path string")
     """
     Reads a csv file in the same directory.
 
@@ -20,7 +21,7 @@ def load_csv(filepath):
     """
 
     try:
-        data = pd.read_csv(filepath)
+        data = pd.read_csv(file_path)
         print('read csv')
         return data
     except Exception as e:
@@ -31,7 +32,8 @@ def load_csv(filepath):
 
  # Creating Timestamp Column
 def feat_eng(df):
-    assert isinstance(df, pd.DataFrame), 'Dataframe Only!'
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("Input 'df' must be a pandas DataFrame!")
     """ 
         Creates column Timestamp.
         Changes Time column to an int.
@@ -64,7 +66,8 @@ def feat_eng(df):
 
  # splitting the dataset into train and test 
 def split(df):
-    assert isinstance(df, pd.DataFrame), 'Dataframe Only!'
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("Input 'df' must be a pandas DataFrame!")
     """ 
     Splits the data into train and Test sets
 
@@ -89,7 +92,8 @@ def split(df):
 
  # splitting data to independent and dependent variables
 def split_func(df):
-    assert isinstance(df, pd.DataFrame), 'Dataframe Only!'
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("Input 'df' must be a pandas DataFrame!")
     """
      Splits the data into Dependant and independent Variables 
 
@@ -227,6 +231,8 @@ def create_test_table( conn ):
  # loading the dataset
  # transaction test data 
 def load_test_data(conn, df):
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("Input 'df' must be a pandas DataFrame!")
     """    
     Loads the Data in the newly created create_test_table
 
@@ -256,6 +262,8 @@ def load_test_data(conn, df):
 
  # transaction train data
 def load_train_data(conn, df):
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("Input 'df' must be a pandas DataFrame!")
     """
     Loads the Data in the newly created create_test_table
 
@@ -285,6 +293,8 @@ def load_train_data(conn, df):
 
  # Importing data from postgres
 def import_data(table_name, engine):
+    if not isinstance(table_name, str):
+        raise ValueError("Input 'table_name' should be a string repin the table name")
     """    
     Imports the data from postgress
     
