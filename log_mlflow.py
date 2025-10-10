@@ -145,10 +145,9 @@ def get_prod_model(model_name, client):
         
         return curr_prod_run_id
     
-    except Exception:
-        curr_prod_run_id = None
+    except Exception as e:
+        print("ERROR IN get_prod_model")
 
-        return curr_prod_run_id
 
 
 # checking if best model is new or same as production model and promoting it to production 
