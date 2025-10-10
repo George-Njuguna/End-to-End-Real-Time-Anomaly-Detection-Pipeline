@@ -50,7 +50,7 @@ def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling, mo
 
             mlflow.log_metric('Precision', model_info["precision"])
             mlflow.log_metric('Recall', model_info["recall"])
-            mlflow.log_metric('F1 Score', model_info["f1_score"])
+            mlflow.log_metric('F1_Score', model_info["f1_score"])
 
             mlflow.log_params(model_info["parameters"])
 
@@ -92,58 +92,54 @@ def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling, mo
 
 # Getting all experiments from a specific domain and getting best run 
 def get_best_run_from_domain(domain, client, metric):
-    
     try:
-        experiments = [
-            exp for exp in client.search_experiments()
-            if exp.tags.get("domain") == domain
-        ]
-        
+
+        experiments = client.search_experiments()
         best_run = None
         best_score = float('-inf')
 
         for exp in experiments:
-            runs = client.search.runs(
-                experiment_ids = [exp.experiment_id],
-                order_by = [f"merics.{metric} DESC"],
-                max_result =1 
+            runs = client.search_runs(
+                experiment_ids=[exp.experiment_id],
+                filter_string=f"tags.domain = '{domain}'",
+                order_by=[f"metrics.{metric} DESC"],
+                max_results=1
             )
 
-            if runs:
+            if runs and len(runs) > 0:
                 run = runs[0]
-                score = run.data.metrics.get(metric, 0)
+                score = run.data.metrics.get(metric, None)
 
-                if score > best_score :
+                if score is not None and score > best_score:
                     best_score = score
                     best_run = run
-                    
+
+        if best_run is None:
+            print(f"No runs with metric '{metric}' found in domain '{domain}'.")
+            return None
 
         best_run_id = best_run.info.run_id
-        print(f"BEST RUN = {best_run} , BEST {metric} SCORE = {best_score} , best_run_id = {best_run_id} ")
+        print(f"BEST RUN = {best_run_id}, BEST {metric} SCORE = {best_score:.4f}")
+        return best_run_id
 
-        return  best_run_id
-        
-    
     except Exception as e:
-        print("ERROR IN get_best_run_from_domain", e)
+        print(f"ERROR IN get_best_run_from_domain: {e}")
+        return None
+
 
 
 # Getting production model for a domain
 def get_prod_model(model_name, client):
-
     try:
-        curr_prod_aliases = client.get_latest_versions(model_name, aliases = ["Production"])
-
-        if curr_prod_aliases:
-            curr_prod_run_id = curr_prod_aliases[0].run_id
-
-        else:
-            curr_prod_run_id = None
-        
-        return curr_prod_run_id
-    
+        model_version = client.get_model_version_by_alias(model_name, "Production")
+        return model_version.run_id
     except Exception as e:
-        print("ERROR IN get_prod_model")
+        if "Registered model alias Production not found" in str(e):
+            return None  # No Production model yet
+        else:
+            print("ERROR IN get_prod_model:", e)
+            return None
+
 
 
 
@@ -176,7 +172,6 @@ def update_production_model(client, model_name, best_run_id, artifact_path, curr
 
         
 
-    
 
 
 

@@ -21,14 +21,14 @@ model1 = modeling_pipe(train_data, False)
 model2 = modeling_pipe(train_data, True)
 
  # logging models, metrics and artifacts to mlflow
-tracking_uri = "http://127.0.0.1:5000" 
+tracking_uri = "http://127.0.0.1:5001" 
 #tracking_uri =  os.getenv('tracking_uri') )
 client = MlflowClient()
-experiment_name = "Fraud_Detection_test"
-model_name = "fraud_detection_test"
+experiment_name = "Fraud_Detection_test1.1"
+model_name = "fraud_detection_test1.1"
 artifact_path = "fraud_model_test"
-metric = "F1 Score"
-domain = 'fraud'
+metric = "F1_Score"
+domain = 'fraud1.1'
 
 mlflow_pipe(model1, tracking_uri, experiment_name, False, model_name, artifact_path,domain)
 mlflow_pipe(model2, tracking_uri, experiment_name, True, model_name, artifact_path,domain)
