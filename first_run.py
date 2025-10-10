@@ -27,7 +27,7 @@ client = MlflowClient()
 experiment_name = "Fraud_Detection_test"
 model_name = "fraud_detection_test"
 artifact_path = "fraud_model_test"
-metric = "f1_score"
+metric = "F1 Score"
 domain = 'fraud'
 
 mlflow_pipe(model1, tracking_uri, experiment_name, False, model_name, artifact_path,domain)
