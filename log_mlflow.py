@@ -95,7 +95,7 @@ def get_best_run_from_domain(domain, client, metric):
     
     try:
         experiments = [
-            exp for exp in client.list_experiments()
+            exp for exp in client.search_experiments()
             if exp.tags.get("domain") == domain
         ]
         
@@ -121,11 +121,8 @@ def get_best_run_from_domain(domain, client, metric):
         best_run_id = best_run.info.run_id
         print(f"BEST RUN = {best_run} , BEST {metric} SCORE = {best_score} , best_run_id = {best_run_id} ")
 
-        return {
-            "best_score" : best_score,
-            "best_run" : best_run,
-            "best_run_id": best_run_id
-        }
+        return  best_run_id
+        
     
     except Exception as e:
         print("ERROR IN get_best_run_from_domain", e)

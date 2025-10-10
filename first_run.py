@@ -30,17 +30,17 @@ artifact_path = "fraud_model_test"
 metric = "f1_score"
 domain = 'fraud'
 
-mlflow_pipe(model1, tracking_uri, experiment_name, False, model_name, artifact_path)
-mlflow_pipe(model2, tracking_uri, experiment_name, True, model_name, artifact_path)
+mlflow_pipe(model1, tracking_uri, experiment_name, False, model_name, artifact_path,domain)
+mlflow_pipe(model2, tracking_uri, experiment_name, True, model_name, artifact_path,domain)
 
  # getting best run in the fraud domain
-X = get_best_run_from_domain(domain , client, metric )
+best_run_id = get_best_run_from_domain(domain , client, metric )
 
  # getting current production model
 prod_model_id = get_prod_model(model_name, client)
 
  # updating production model
-update_production_model(client, model_name, X["best_run_id"], artifact_path, prod_model_id )
+update_production_model(client, model_name, best_run_id, artifact_path, prod_model_id )
 
 
 
