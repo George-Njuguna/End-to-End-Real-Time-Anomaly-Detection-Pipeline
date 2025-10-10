@@ -132,10 +132,10 @@ def get_best_run_from_domain(domain, client, metric):
 def get_prod_model(model_name, client):
 
     try:
-        curr_prod = client.get_latest_versions(model_name, stages = ["Production"])
+        curr_prod_aliases = client.get_latest_versions(model_name, aliases = ["Production"])
 
-        if curr_prod:
-            curr_prod_run_id = curr_prod[0].run_id
+        if curr_prod_aliases:
+            curr_prod_run_id = curr_prod_aliases[0].run_id
 
         else:
             curr_prod_run_id = None
