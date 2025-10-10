@@ -4,7 +4,6 @@ from mlflow.models.signature import infer_signature
 import matplotlib.pyplot as plt
 from datetime import datetime
 import seaborn as sns
-from mlflow.tracking import MlflowClient
 
 
 timestamp = datetime.now().strftime( "%Y-%m-%d" )
@@ -144,11 +143,12 @@ def get_prod_model(model_name, client):
         else:
             curr_prod_run_id = None
         
+        return curr_prod_run_id
     
     except Exception:
         curr_prod_run_id = None
 
-    return curr_prod_run_id
+        return curr_prod_run_id
 
 
 # checking if best model is new or same as production model and promoting it to production 
