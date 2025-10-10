@@ -8,7 +8,7 @@ import seaborn as sns
 
 timestamp = datetime.now().strftime( "%Y-%m-%d" )
 
-def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling, model_name ,artifact_path):
+def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling, model_name ,artifact_path, domain):
 
     if not isinstance(model_info, dict):
         raise ValueError("Input 'model_info' must be a dictonary what is returned after 'modelling_pipe'")
@@ -62,7 +62,7 @@ def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling, mo
                 mlflow.set_tag("Imbalance Handling", "SMOTE")
 
             mlflow.set_tag("Trained_at", f"{timestamp}")
-            mlflow.set_tag("domain", "fraud")
+            mlflow.set_tag("domain", domain)
 
             
             report = model_info["classification_report"]
