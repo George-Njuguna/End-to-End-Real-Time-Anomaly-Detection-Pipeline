@@ -23,8 +23,9 @@ model1 = modeling_pipe(train_data, False)
 tracking_uri = "http://127.0.0.1:5000" 
 #tracking_uri =  os.getenv('tracking_uri') )
 experiment_name = "Fraud_Detection_test"
+model_name = "fraud_detection_test"
 
-mlflow_pipe(model1, tracking_uri, experiment_name, False )
+mlflow_pipe(model1, tracking_uri, experiment_name, False, model_name )
 
 
 def main():
