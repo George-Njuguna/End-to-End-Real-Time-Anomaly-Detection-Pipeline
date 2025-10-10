@@ -4,11 +4,12 @@ from mlflow.models.signature import infer_signature
 import matplotlib.pyplot as plt
 from datetime import datetime
 import seaborn as sns
+from mlflow.tracking import MlflowClient
 
 
 timestamp = datetime.now().strftime( "%Y-%m-%d" )
 
-def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling, model_name ):
+def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling, model_name ,artifact_path):
 
     if not isinstance(model_info, dict):
         raise ValueError("Input 'model_info' must be a dictonary what is returned after 'modelling_pipe'")
@@ -44,7 +45,7 @@ def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling, mo
         with mlflow.start_run( run_name = f"Logistic_model{timestamp}" ) as run:
             mlflow.sklearn.log_model(
                 sk_model = model_info["model"],
-                artifact_path = "fraud_model_test",
+                artifact_path = artifact_path,
                 registered_model_name= model_name
             )
 
@@ -90,7 +91,99 @@ def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling, mo
         print("ERROR : ", e)
 
 
-# checking best performing model
+# Getting all experiments from a specific domain and getting best run 
+def get_best_run_from_domain(domain, client, metric):
+    
+    try:
+        experiments = [
+            exp for exp in client.list_experiments()
+            if exp.tags.get("domain") == domain
+        ]
+        
+        best_run = None
+        best_score = float('-inf')
+
+        for exp in experiments:
+            runs = client.search.runs(
+                experiment_ids = [exp.experiment_id],
+                order_by = [f"merics.{metric} DESC"],
+                max_result =1 
+            )
+
+            if runs:
+                run = runs[0]
+                score = run.data.metrics.get(metric, 0)
+
+                if score > best_score :
+                    best_score = score
+                    best_run = run
+                    
+
+        best_run_id = best_run.info.run_id
+        print(f"BEST RUN = {best_run} , BEST {metric} SCORE = {best_score} , best_run_id = {best_run_id} ")
+
+        return {
+            "best_score" : best_score,
+            "best_run" : best_run,
+            "best_run_id": best_run_id
+        }
+    
+    except Exception as e:
+        print("ERROR IN get_best_run_from_domain", e)
+
+
+# Getting production model for a domain
+def get_prod_model(model_name, client):
+
+    try:
+        curr_prod = client.get_latest_versions(model_name, stages = ["Production"])
+
+        if curr_prod:
+            curr_prod_run_id = curr_prod[0].run_id
+
+        else:
+            curr_prod_run_id = None
+        
+    
+    except Exception:
+        curr_prod_run_id = None
+
+    return curr_prod_run_id
+
+
+# checking if best model is new or same as production model and promoting it to production 
+def update_production_model(client, model_name, best_run_id, artifact_path, curr_prod_id):
+
+    try:
+        if best_run_id == curr_prod_id:
+            print("NO UPDATE NEEDED")
+
+        else:
+            model_uri = f"runs:/{best_run_id}/{artifact_path}"
+            registered_model = mlflow.register_model(model_uri, model_name)
+            version = registered_model.version
+
+            #Transitioning it to production
+            client.transition_model_version_stage(
+                name = model_name,
+                version = version,
+                stage = "Production",
+                archive_existing_versions = True
+            )
+
+            print(f"New Model Version{version} promoted to Production")
+
+    except Exception as e:
+        print("ERROR in update_production_model ", e)
+
+            
+
+        
+
+    
+
+
+
 
 
 
