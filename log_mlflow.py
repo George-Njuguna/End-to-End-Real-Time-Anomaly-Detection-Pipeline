@@ -8,7 +8,7 @@ import seaborn as sns
 
 timestamp = datetime.now().strftime( "%Y-%m-%d" )
 
-def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling):
+def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling, model_name ):
 
     if not isinstance(model_info, dict):
         raise ValueError("Input 'model_info' must be a dictonary what is returned after 'modelling_pipe'")
@@ -21,6 +21,9 @@ def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling):
     
     if not isinstance(experiment_name, str):
         raise ValueError("Input 'experiment_name' must be a string representing the experiment name")
+    
+    if not isinstance(model_name, str):
+        raise ValueError("Input 'model_name' must be a string representing the model name")
     
     """    
     logs model , parameters metrics and artifacts to mlflow
@@ -42,7 +45,7 @@ def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling):
             mlflow.sklearn.log_model(
                 sk_model = model_info["model"],
                 artifact_path = "fraud_model_test",
-                registered_model_name= "fraud_detection_test"
+                registered_model_name= model_name
             )
 
             mlflow.log_metric('Precision', model_info["precision"])
@@ -85,6 +88,11 @@ def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling):
 
     except Exception as e:
         print("ERROR : ", e)
+
+
+# checking best performing model
+
+
 
 
 
