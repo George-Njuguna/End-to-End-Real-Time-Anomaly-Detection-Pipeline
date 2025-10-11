@@ -156,7 +156,7 @@ def update_production_model(client, model_name, best_run_id, artifact_path, curr
             version = registered_model.version
 
             #Transitioning it to production
-            client.set_version_alias(
+            client.set_registered_model_alias(
                 name = model_name,
                 version = version,
                 alias = "Production",
