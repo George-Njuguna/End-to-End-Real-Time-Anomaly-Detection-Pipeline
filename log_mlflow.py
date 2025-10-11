@@ -149,21 +149,36 @@ def update_production_model(client, model_name, best_run_id, artifact_path, curr
     try:
         if best_run_id == curr_prod_id:
             print("NO UPDATE NEEDED")
+            
 
         else:
-            model_uri = f"runs:/{best_run_id}/{artifact_path}"
-            registered_model = mlflow.register_model(model_uri, model_name)
-            version = registered_model.version
+            versions = client.search_model_versions(f"name='{model_name}'")
+
+            target_version = None
+
+            for v in versions:
+                if v.run_id == best_run_id:
+                    target_version = v.version
+                    break
+
+            if target_version == None:    
+                model_uri = f"runs:/{best_run_id}/{artifact_path}"
+                registered_model = mlflow.register_model(model_uri, model_name)
+                version = registered_model.version
+                print(f" Registered new version {target_version} for run {best_run_id}")
+
+            else:
+                print(f"Existing version {target_version} found for best run {best_run_id}")                
 
             #Transitioning it to production
             client.set_registered_model_alias(
                 name = model_name,
-                version = version,
+                version = target_version,
                 alias = "Production",
                 archive_existing_versions = True
             )
 
-            print(f"New Model Version{version} promoted to Production")
+            print(f"New Model Version{target_version} promoted to Production")
 
     except Exception as e:
         print("ERROR in update_production_model ", e)
