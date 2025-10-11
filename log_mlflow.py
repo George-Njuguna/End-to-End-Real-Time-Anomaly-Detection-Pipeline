@@ -92,6 +92,24 @@ def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling, mo
 
 # Getting all experiments from a specific domain and getting best run 
 def get_best_run_from_domain(domain, client, metric):
+    if not isinstance( domain, str ):
+        raise ValueError("Input 'domain' must be a string repin domain tag")
+    if not isinstance( metric, str ):
+        raise ValueError("Input 'metric' must be a string repin the performance metric")
+    """ 
+    gets best run id based on the highest 'metric'  
+
+    Parameters
+    ----------
+    domain : str that representing the domain tag in a run in mlflow
+    client : Mlflow tracking client 
+    metric : metric ie F1_score , Recall etc
+
+    Returns
+    -------
+    best_run_id
+    """
+
     try:
 
         experiments = client.search_experiments()
@@ -130,22 +148,46 @@ def get_best_run_from_domain(domain, client, metric):
 
 # Getting production model for a domain
 def get_prod_model(model_name, client):
+    """ 
+    gets the current production model with a certain model name ie if model names are fraud_detection_model gets production model with that name  
+
+    Parameters
+    ----------
+    model_name : str that representing the model name given while running and logging the experiment 
+    client : Mlflow tracking client 
+
+    Returns
+    -------
+    production model run ID if there is a production model if not returns none 
+
+    """
     try:
         model_version = client.get_model_version_by_alias(model_name, "Production")
         return model_version.run_id
+    
     except Exception as e:
         if "Registered model alias Production not found" in str(e):
-            return None  # No Production model yet
+            return None  
         else:
             print("ERROR IN get_prod_model:", e)
-            return None
 
 
 
 
 # checking if best model is new or same as production model and promoting it to production 
 def update_production_model(client, model_name, best_run_id, artifact_path, curr_prod_id):
+    """ 
+    checks the best run id and compares it to the current production id if they dont match the best_run_id model gets updated to production.
 
+    Parameters
+    ----------
+    model_name : str that representing the model name given while running and logging the experiment
+    client : Mlflow tracking client 
+    best_run_id : run id returned from get_best_run_from_domain function
+    artifact_path : artifact path set while logging model to mlflow
+    curr_prod_id : the production run id that is returned from get_prod_model
+
+    """
     try:
         if best_run_id == curr_prod_id:
             print("NO UPDATE NEEDED")
@@ -164,7 +206,7 @@ def update_production_model(client, model_name, best_run_id, artifact_path, curr
             if target_version == None:    
                 model_uri = f"runs:/{best_run_id}/{artifact_path}"
                 registered_model = mlflow.register_model(model_uri, model_name)
-                version = registered_model.version
+                target_version = registered_model.version
                 print(f" Registered new version {target_version} for run {best_run_id}")
 
             else:
