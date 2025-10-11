@@ -174,8 +174,7 @@ def update_production_model(client, model_name, best_run_id, artifact_path, curr
             client.set_registered_model_alias(
                 name = model_name,
                 version = target_version,
-                alias = "Production",
-                archive_existing_versions = True
+                alias = "Production"
             )
 
             print(f"New Model Version{target_version} promoted to Production")
