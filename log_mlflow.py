@@ -44,7 +44,7 @@ def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling, mo
         with mlflow.start_run( run_name = f"Logistic_model{timestamp}" ) as run:
             mlflow.sklearn.log_model(
                 sk_model = model_info["model"],
-                artifact_path = artifact_path,
+                name = artifact_path,
                 registered_model_name= model_name
             )
 
