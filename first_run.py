@@ -7,6 +7,15 @@ from log_mlflow import mlflow_pipe, get_best_run_from_domain, get_prod_model, up
 from mlflow.tracking import MlflowClient
 
 load_dotenv()
+table_name = 'transactions_train_raw'
+tracking_uri = "http://127.0.0.1:5001" 
+#tracking_uri =  os.getenv('tracking_uri') )
+client = MlflowClient()
+experiment_name = "Fraud_Detection_test"
+model_name = "fraud_detection_test"
+artifact_path = "fraud_model_test"
+metric = "F1_Score"
+domain = 'fraud'
 
  # Connecting to the database 
 engine = create_engine(
@@ -14,22 +23,15 @@ engine = create_engine(
     )
 
  # importing the data for training
-train_data = import_data('transactions_train_raw', engine )
+train_data = import_data(table_name, engine )
 
  # Training the model
 model1 = modeling_pipe(train_data, False)
 model2 = modeling_pipe(train_data, True)
 
- # logging models, metrics and artifacts to mlflow
-tracking_uri = "http://127.0.0.1:5001" 
-#tracking_uri =  os.getenv('tracking_uri') )
-client = MlflowClient()
-experiment_name = "Fraud_Detection_test1.1"
-model_name = "fraud_detection_test1.1"
-artifact_path = "fraud_model_test"
-metric = "F1_Score"
-domain = 'fraud1.1'
 
+
+ # loading the models to mlflow 
 mlflow_pipe(model1, tracking_uri, experiment_name, False, model_name, artifact_path,domain)
 mlflow_pipe(model2, tracking_uri, experiment_name, True, model_name, artifact_path,domain)
 
