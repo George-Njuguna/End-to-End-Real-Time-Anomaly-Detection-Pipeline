@@ -114,20 +114,20 @@ def split_func(df):
         print(" ERROR : COULD NOT SPLIT TO VARIABLES : ", e)
 
 
- # Creating tables in postgress
- # transactions_train_raw
-def create_train_table( conn ):  
+ # Creating table in postgress
+def create_table( conn, table_name ):  
     """    
-    Creates transactions_train_raw table if it doesnt exist
+    Creates table with name 'table_name' if it doesnt exist
 
     Parameters
     ----------
     conn : connection to the dataframe 
+    table_name : name of the table being created
     """
     try:
         with conn.cursor() as cur:
-            cur.execute("""
-                CREATE TABLE IF NOT EXISTS transactions_train_raw (
+            cur.execute(f"""
+                CREATE TABLE IF NOT EXISTS {table_name} (
                     transaction_id SERIAL PRIMARY KEY,     
                     time_seconds INT NOT NULL,                      
                     v1 DOUBLE PRECISION,
@@ -164,82 +164,28 @@ def create_train_table( conn ):
                 );
             """)
             conn.commit()
-            print("✅ Table 'transactions_train_raw' CREATED/EXISTS).")
+            print(f"✅ Table '{table_name}' CREATED/EXISTS).")
     
     except Exception as e:
-        print("❌ ERROR Creating table transactions_train_raw : ", e)
+        print(f"❌ ERROR Creating {table_name} : ", e)
         if conn:
             conn.rollback()
 
 
- # transactions_test_raw            
-def create_test_table( conn ):   
-    """
-    Creates transactions_test_raw table if it doesnt exist
-
-    Parameters
-    ----------
-    conn : connection to the dataframe 
-    """
-    try:
-        with conn.cursor() as cur:
-            cur.execute("""
-                CREATE TABLE IF NOT EXISTS transactions_test_raw (
-                    transaction_id SERIAL PRIMARY KEY,     
-                    time_seconds INT NOT NULL,                      
-                    v1 DOUBLE PRECISION,
-                    v2 DOUBLE PRECISION,
-                    v3 DOUBLE PRECISION,
-                    v4 DOUBLE PRECISION,
-                    v5 DOUBLE PRECISION,
-                    v6 DOUBLE PRECISION,
-                    v7 DOUBLE PRECISION,
-                    v8 DOUBLE PRECISION,
-                    v9 DOUBLE PRECISION,
-                    v10 DOUBLE PRECISION,
-                    v11 DOUBLE PRECISION,
-                    v12 DOUBLE PRECISION,
-                    v13 DOUBLE PRECISION,
-                    v14 DOUBLE PRECISION,
-                    v15 DOUBLE PRECISION,
-                    v16 DOUBLE PRECISION,
-                    v17 DOUBLE PRECISION,
-                    v18 DOUBLE PRECISION,
-                    v19 DOUBLE PRECISION,
-                    v20 DOUBLE PRECISION,
-                    v21 DOUBLE PRECISION,
-                    v22 DOUBLE PRECISION,
-                    v23 DOUBLE PRECISION,
-                    v24 DOUBLE PRECISION,
-                    v25 DOUBLE PRECISION,
-                    v26 DOUBLE PRECISION,
-                    v27 DOUBLE PRECISION,
-                    v28 DOUBLE PRECISION,
-                    ammount NUMERIC(10,2) NOT NULL,
-                    fraud SMALLINT NOT NULL,
-                    timestamp TIMESTAMP NOT NULL       
-                );
-            """)
-            conn.commit()
-            print("✅ Table 'transactions_test_raw' CREATED/EXISTS).")
-    
-    except Exception as e:
-        print("❌ ERROR Creating table transactions_test_raw : ", e)
-        if conn:
-            conn.rollback()
 
  # loading the dataset
  # transaction test data 
-def load_test_data(conn, df):
+def load_data(conn, df, table_name):
     if not isinstance(df, pd.DataFrame):
         raise ValueError("Input 'df' must be a pandas DataFrame!")
     """    
-    Loads the Data in the newly created create_test_table
+    Loads the Data in the specified 'table_name'
 
     Parameters
     ----------
     conn : connection to the Database
     df : pd.Dataframe containing the data to be loaded
+    table_name : str representing the table name where the data is being loaded
     """
     try:
         with conn.cursor() as cur:
@@ -248,7 +194,7 @@ def load_test_data(conn, df):
             columns = ', '.join(df.columns)
             
             sql = f"""
-                INSERT INTO transactions_test_raw ({columns})
+                INSERT INTO {table_name} ({columns})
                 VALUES %s
             """
 
@@ -256,40 +202,11 @@ def load_test_data(conn, df):
             execute_values(cur, sql, records, page_size=10000)
 
             conn.commit()
-            print(f"✅ Inserted {len(records)} rows into transactions_test_raw")
+            print(f"✅ Inserted {len(records)} rows into {table_name}")
     except Exception as e:
-        print("❌ ERROR in Loading transactions_test_DATA", e)
+        print("❌ ERROR in Loading data in {table_name}", e)
 
- # transaction train data
-def load_train_data(conn, df):
-    if not isinstance(df, pd.DataFrame):
-        raise ValueError("Input 'df' must be a pandas DataFrame!")
-    """
-    Loads the Data in the newly created create_test_table
 
-    Parameters
-    ----------
-    conn : connection to the Database
-    df : pd.Dataframe containing the data to be loaded
-    """
-    try:
-        with conn.cursor() as cur:
-
-            records = list(df.itertuples(index=False, name=None))
-            columns = ', '.join(df.columns)
-
-            sql = f"""
-                INSERT INTO transactions_train_raw ({columns})
-                VALUES %s
-            """
-
-            # Bulk insert
-            execute_values(cur, sql, records, page_size=10000)
-
-            conn.commit()
-            print(f"✅ Inserted {len(records)} rows into transactions_train_raw")
-    except Exception as e:
-        print("❌ ERROR in Loading transactions_train_DATA", e)
 
  # Importing data from postgres
 def import_data(table_name, engine):
