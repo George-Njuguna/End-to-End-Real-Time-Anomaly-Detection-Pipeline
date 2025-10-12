@@ -11,18 +11,16 @@ from dotenv import load_dotenv
 import psycopg2
 import pandas as pd
 import os
-from functions import split_func, create_train_table, create_test_table, load_test_data,load_train_data
+from functions import split_func, create_table, load_data
 
 load_dotenv()
 
 # LOADING DATA TO POSTGRESS PIPELINE 
-def load_to_postgress(train_df, test_df):
+def load_to_postgress(df , table_name):
 
-    if not isinstance(train_df, pd.DataFrame):
+    if not isinstance(df, pd.DataFrame):
         raise ValueError("Input 'train_df' must be a pandas DataFrame!")
     
-    if not isinstance(test_df, pd.DataFrame):
-        raise ValueError("Input 'test_df' must be a pandas DataFrame!")
 
     """
     Creates Train and Test Tables in postgres if they dont exist
@@ -30,8 +28,8 @@ def load_to_postgress(train_df, test_df):
 
     Parameters
     ----------
-    train_df : pd.DataFrame 
-    test_df : pd.DataFrame
+    df : pd.DataFrame 
+    table_name : name of the table being loaded
     """
 
     try:
@@ -46,12 +44,10 @@ def load_to_postgress(train_df, test_df):
         print('✅ Connection made')
 
         # Checking if the tables Exist/Creating The Tables
-        create_train_table(conn)
-        create_test_table(conn)
+        create_table(conn, table_name)
         
         # Loading The Data
-        load_test_data(conn, test_df)
-        load_train_data(conn, train_df)
+        load_data(conn, df, table_name)
 
     except Exception as e:
         print("❌ ERROR IN LOADING PIPELINE:", e)
