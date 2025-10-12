@@ -65,7 +65,7 @@ def feat_eng(df):
 
 
  # splitting the dataset into train and test 
-def split(df):
+def split_1(df):
     if not isinstance(df, pd.DataFrame):
         raise ValueError("Input 'df' must be a pandas DataFrame!")
     """ 
