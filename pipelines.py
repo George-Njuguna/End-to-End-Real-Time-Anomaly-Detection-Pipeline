@@ -2,7 +2,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline as pipeline
 from sklearn.compose import ColumnTransformer
-from sklearn.model_selection import ParameterGrid
+from mlflow.models.signature import infer_signature
 from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline as smtpipeline
 from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV
@@ -84,6 +84,10 @@ def modeling_pipe(data, imbalance_handling):
     -------
     a dictonary that contains precision, Recall, f1, classification_report, best_model, Best_Parameters
     """
+     # getting data parameters
+    data_version = f"From Transaction ID {data.iloc[0,0]} To {data.iloc[-1,0]}"
+    rows_number = len(data)
+    columns = list(data.iloc[:,2,-2].columns)
 
      # splitting variables(dependent, independent)
     X, y = split_func(data)
@@ -154,6 +158,7 @@ def modeling_pipe(data, imbalance_handling):
         class_report = classification_report(y_test, y_pred, target_names=["No Fraud", "Fraud"])
         cm = confusion_matrix(y_test, y_pred)
         Best_Parameters = grid.best_params_
+        signature = infer_signature( X_train, best_model.predict(X_train) )
         print("COMPLETED MODELLING....")
 
         return {
@@ -163,7 +168,11 @@ def modeling_pipe(data, imbalance_handling):
             "classification_report":class_report,
             "model":best_model,
             "parameters":Best_Parameters,
-            'confusion_matrix':cm
+            "confusion_matrix":cm,
+            "signature":signature,
+            "data_version":data_version,
+            "rows_number":rows_number,
+            "columns":columns
         }
     
     
