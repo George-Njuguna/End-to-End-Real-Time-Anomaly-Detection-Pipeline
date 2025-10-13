@@ -1,6 +1,5 @@
 import mlflow
 import mlflow.sklearn
-from mlflow.models.signature import infer_signature
 import matplotlib.pyplot as plt
 from datetime import datetime
 import seaborn as sns
