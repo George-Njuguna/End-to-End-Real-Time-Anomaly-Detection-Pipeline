@@ -54,6 +54,9 @@ def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling, mo
             mlflow.log_metric('F1_Score', model_info["f1_score"])
 
             mlflow.log_params(model_info["parameters"])
+            mlflow.log_param("Data_version", model_info['data_version'])
+            mlflow.log_param("Rows", model_info['rows_number'])
+            mlflow.log_param("Columns", model_info['columns'])
 
             #mlflow.set_tag("dataset_version", "v1")
 
