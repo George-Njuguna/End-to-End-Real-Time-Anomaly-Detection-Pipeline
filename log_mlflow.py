@@ -6,7 +6,7 @@ from datetime import datetime
 import seaborn as sns
 
 
-timestamp = datetime.now().strftime( "%Y-%m-%d" )
+timestamp = datetime.now().strftime( "%Y_%m_%d" )
 
 def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling, model_name ,artifact_path, domain):
 
@@ -41,11 +41,12 @@ def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling, mo
         mlflow.set_tracking_uri( uri = tracking_uri )
         mlflow.set_experiment(experiment_name)
 
-        with mlflow.start_run( run_name = f"Logistic_model{timestamp}" ) as run:
+        with mlflow.start_run( run_name = f"Logistic_model_{timestamp}" ) as run:
             mlflow.sklearn.log_model(
                 sk_model = model_info["model"],
                 name = artifact_path,
-                registered_model_name= model_name
+                registered_model_name= model_name,
+                signature= model_info['signature']
             )
 
             mlflow.log_metric('Precision', model_info["precision"])
