@@ -28,7 +28,7 @@ def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling, mo
     logs model , parameters metrics and artifacts to mlflow
 
     Parameters
-    ----------
+    ---------- 
     model_info : dict that is returned after running the modelling pipeline model_pipe
     tracking_uri : str , tracking uri of mlflow
     experiment_name : str name of the experiment being loaded to mlflow
