@@ -7,10 +7,10 @@ from log_mlflow import mlflow_pipe, get_best_run_from_domain, get_prod_model, up
 from mlflow.tracking import MlflowClient
 
 load_dotenv()
-table_name = 'transactions_train_raw'
-tracking_uri = "http://127.0.0.1:5001" 
-#tracking_uri =  os.getenv('tracking_uri') )
 client = MlflowClient()
+
+table_name = 'transactions_train_raw'
+tracking_uri = "http://mlflow:5000"
 experiment_name = "Fraud_Detection_test"
 model_name = "fraud_detection_test"
 artifact_path = "fraud_model_test"
@@ -19,7 +19,7 @@ domain = 'fraud'
 
  # Connecting to the database 
 engine = create_engine(
-    f"postgresql+psycopg2://{os.getenv('user')}:{os.getenv('password')}@{os.getenv('host')}:{os.getenv('port')}/{os.getenv('database')}"
+    f"postgresql+psycopg2://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PW')}@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
     )
 
  # importing the data for training
