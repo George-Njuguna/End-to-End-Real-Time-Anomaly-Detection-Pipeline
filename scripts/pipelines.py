@@ -35,11 +35,11 @@ def load_to_postgress(df , table_name):
     try:
         # connecting to the database
         conn = psycopg2.connect(
-            dbname=os.getenv('database'),
-            user=os.getenv('user'),
-            password=os.getenv('password'),
-            host = os.getenv('host'),
-            port=os.getenv('port')
+            dbname=os.getenv('POSTGRES_DB'),
+            user=os.getenv('POSTGRES_USER'),
+            password=os.getenv('POSTGRES_PW'),
+            host = os.getenv('POSTGRES_HOST'),
+            port=os.getenv('POSTGRES_HOST')
         )
         print('✅ Connection made')
 
