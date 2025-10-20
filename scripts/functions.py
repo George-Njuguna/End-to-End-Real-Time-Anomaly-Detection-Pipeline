@@ -35,7 +35,6 @@ def feat_eng(df):
     if not isinstance(df, pd.DataFrame):
         raise ValueError("Input 'df' must be a pandas DataFrame!")
     """ 
-        Creates column Timestamp.
         Changes Time column to an int.
         Renames columns Time , Class and Amount 
 
@@ -48,9 +47,6 @@ def feat_eng(df):
     df : Dataframe
     """
     
-    start_time = pd.to_datetime("2025-09-20 00:00:00")
-    df["timestamp"] = start_time + pd.to_timedelta(df["Time"], unit="s")
-    df["timestamp"] = df["timestamp"].apply(lambda x: x.to_pydatetime())
     df["Time"] = df['Time'].astype(int)
 
     # Rename for consistency
