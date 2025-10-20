@@ -12,7 +12,7 @@ DATA = load_csv('creditcard.csv')
 try:
     data = feat_eng(DATA)
 except Exception as e:
-    print(" ERROR IN [ADDING TIMESTAMP AND CHANGING COLUMN NAMES]:", e)
+    print(" ERROR IN [CHANGING COLUMN NAMES]:", e)
 
  # splitting the data
 try:
