@@ -12,5 +12,5 @@ with DAG(
 
     run_script = BashOperator(
         task_id="run_script_2",
-        bash_command="python /opt/airflow/fraud_scripts/script_2"
+        bash_command="python /opt/airflow/fraud_scripts/script_2.py"
     )
