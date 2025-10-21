@@ -86,6 +86,7 @@ services:
           --host ${MLFLOW_HOST} \
           --port ${MLFLOW_PORT}
       "
+
     ports:
       - "${MLFLOW_PORT}:${MLFLOW_PORT}"
     healthcheck:
