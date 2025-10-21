@@ -88,7 +88,7 @@ x-airflow-common:
     postgres:
       condition: service_healthy
   networks:
-    - airflow_default
+    - default
     - fraud_network 
 
 
@@ -108,7 +108,7 @@ services:
       start_period: 5s
     restart: always
     networks:
-      - airflow_default
+      - default
 
   redis:
     # Redis is limited to 7.2-bookworm due to licencing change
@@ -124,7 +124,7 @@ services:
       start_period: 30s
     restart: always
     networks:
-      - airflow_default
+      - default
 
   airflow-apiserver:
     <<: *airflow-common
@@ -140,7 +140,7 @@ services:
       start_period: 200s
     restart: always
     networks:
-      - airflow_default    
+      - default    
       - fraud_network 
     depends_on:
       <<: *airflow-common-depends-on
@@ -159,7 +159,7 @@ services:
       start_period: 200s
     restart: always
     networks:
-      - airflow_default     # for airflow components
+      - default    
       - fraud_network 
     depends_on:
       <<: *airflow-common-depends-on
