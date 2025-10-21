@@ -88,7 +88,7 @@ x-airflow-common:
     postgres:
       condition: service_healthy
   networks:
-    - default
+    - airflow_default
     - fraud_network 
 
 
@@ -107,6 +107,8 @@ services:
       retries: 5
       start_period: 5s
     restart: always
+    networks:
+      - airflow_default
 
   redis:
     # Redis is limited to 7.2-bookworm due to licencing change
@@ -121,6 +123,8 @@ services:
       retries: 50
       start_period: 30s
     restart: always
+    networks:
+      - airflow_default
 
   airflow-apiserver:
     <<: *airflow-common
@@ -128,13 +132,16 @@ services:
     ports:
       - "5000:8080"
     healthcheck:
-      disable: true
+      disable: false
       test: ["CMD", "curl", "--fail", "http://localhost:8080/api/v2/version"]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 200s
     restart: always
+    networks:
+      - airflow_default    
+      - fraud_network 
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
@@ -144,13 +151,16 @@ services:
     <<: *airflow-common
     command: airflow scheduler
     healthcheck:
-      disable: true
+      disable: false
       test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 200s
     restart: always
+    networks:
+      - airflow_default     # for airflow components
+      - fraud_network 
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
@@ -160,7 +170,7 @@ services:
     <<: *airflow-common
     command: airflow dag-processor
     healthcheck:
-      disable: true
+      disable: false
       test: ["CMD-SHELL", 'airflow jobs check --job-type DagProcessorJob --hostname "$${HOSTNAME}"']
       interval: 30s
       timeout: 10s
@@ -176,7 +186,7 @@ services:
     <<: *airflow-common
     command: celery worker
     healthcheck:
-      disable: true
+      disable: false
       # yamllint disable rule:line-length
       test:
         - "CMD-SHELL"
@@ -202,7 +212,7 @@ services:
     <<: *airflow-common
     command: triggerer
     healthcheck:
-      disable: true
+      disable: false
       test: ["CMD-SHELL", 'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"']
       interval: 30s
       timeout: 10s
