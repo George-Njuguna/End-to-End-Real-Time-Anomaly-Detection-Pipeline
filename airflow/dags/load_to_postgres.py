@@ -4,7 +4,7 @@ from datetime import datetime
 from pendulum import timezone
 
 with DAG(
-    dag_id="run_playlist_script_once",
+    dag_id="run_script_1_once",
     start_date=datetime(2024, 1, 1, tzinfo=timezone("Africa/Nairobi")),
     end_date=datetime(2025, 1, 1, 18, 2, tzinfo=timezone("Africa/Nairobi")),
     schedule="0 18 * * *",
