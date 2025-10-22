@@ -6,7 +6,7 @@ from pendulum import timezone
 with DAG(
     dag_id="run_script_1_once",
     start_date=datetime(2024, 1, 1, tzinfo=timezone("Africa/Nairobi")),
-    end_date=datetime(2025, 10, 21, 18, 2, tzinfo=timezone("Africa/Nairobi")),
+    end_date=datetime(2025, 10, 23, 18, 2, tzinfo=timezone("Africa/Nairobi")),
     schedule="0 18 * * *",
     catchup=False
 ) as dag:
