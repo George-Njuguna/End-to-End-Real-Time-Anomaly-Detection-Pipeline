@@ -22,7 +22,7 @@ def load_csv(file_path):
 
     try:
         data = pd.read_csv(file_path)
-        print(' CSV READ ')
+        print(' CSV SUCESSFULLY LOADED ')
         return data
     except Exception as e:
         print(" ERROR IN READING CSV FILE:", e)
