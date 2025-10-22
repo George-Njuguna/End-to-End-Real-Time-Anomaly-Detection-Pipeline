@@ -26,6 +26,6 @@ services:
 
 networks:
   default:
-    name: airflow_default
+    name: postgres_default
   fraud_network:
     external: true    
