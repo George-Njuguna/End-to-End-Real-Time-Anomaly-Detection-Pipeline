@@ -80,7 +80,7 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
-    - /g/PYTHON_PROJECTS/Scripts/Fraud_Detection_Pipeline/scripts:/opt/airflow/fraud_scripts    
+    - /g/PYTHON_PROJECTS/Scripts/Fraud_Detection_Pipeline/scripts:/opt/airflow/fraud_scripts
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -88,9 +88,6 @@ x-airflow-common:
       condition: service_healthy
     postgres:
       condition: service_healthy
-  networks:
-    - default
-    - fraud_network 
 
 services:
   postgres:
@@ -130,7 +127,7 @@ services:
     <<: *airflow-common
     command: api-server
     ports:
-      - "5000:8080"
+      - "8080:8080"
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/api/v2/version"]
       interval: 30s
@@ -144,7 +141,7 @@ services:
         condition: service_completed_successfully
     networks:
       - default
-      - fraud_network 
+      - fraud_network
 
   airflow-scheduler:
     <<: *airflow-common
@@ -162,7 +159,7 @@ services:
         condition: service_completed_successfully
     networks:
       - default
-      - fraud_network 
+      - fraud_network
 
   airflow-dag-processor:
     <<: *airflow-common
@@ -350,7 +347,6 @@ services:
 
 volumes:
   postgres-db-volume:
-
 networks:
   default:
     name: airflow_default
