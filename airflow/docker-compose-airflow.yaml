@@ -53,7 +53,7 @@ x-airflow-common:
   build: .
   env_file:
     - .env  
-    - ./scripts/.env
+    - ../scripts/.env
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
