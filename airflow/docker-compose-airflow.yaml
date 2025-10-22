@@ -52,7 +52,7 @@ x-airflow-common:
   image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:3.1.0}
   build: .
   env_file:
-    - .env
+    - .env  
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
@@ -62,8 +62,8 @@ x-airflow-common:
     AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
     AIRFLOW__CORE__FERNET_KEY: ''
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
-    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: 'http://airflow-apiserver:5000/execution/'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'true'
+    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: 'http://airflow-apiserver:8080/execution/'
     # yamllint disable rule:line-length
     # Use simple http server on scheduler for health checks
     # See https://airflow.apache.org/docs/apache-airflow/stable/administration-and-deployment/logging-monitoring/check-health.html#scheduler-health-check-server
@@ -79,7 +79,7 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
-    - /g/PYTHON_PROJECTS/Scripts/Fraud_Detection_Pipeline/scripts:/opt/airflow/fraud_scripts
+    - /g/PYTHON_PROJECTS/Scripts/Fraud_Detection_Pipeline/scripts:/opt/airflow/fraud_scripts    
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -90,7 +90,6 @@ x-airflow-common:
   networks:
     - default
     - fraud_network 
-
 
 services:
   postgres:
@@ -128,54 +127,51 @@ services:
 
   airflow-apiserver:
     <<: *airflow-common
-    command: airflow api-server
+    command: api-server
     ports:
-      - "5000:8080"
+      - "8080:8080"
     healthcheck:
-      disable: false
       test: ["CMD", "curl", "--fail", "http://localhost:8080/api/v2/version"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 200s
+      start_period: 30s
     restart: always
-    networks:
-      - default    
-      - fraud_network 
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    networks:
+      - default
+      - fraud_network 
 
   airflow-scheduler:
     <<: *airflow-common
-    command: airflow scheduler
+    command: scheduler
     healthcheck:
-      disable: false
       test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 200s
+      start_period: 30s
     restart: always
-    networks:
-      - default    
-      - fraud_network 
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    networks:
+      - default
+      - fraud_network 
 
   airflow-dag-processor:
     <<: *airflow-common
-    command: airflow dag-processor
+    command: dag-processor
     healthcheck:
-      disable: false
       test: ["CMD-SHELL", 'airflow jobs check --job-type DagProcessorJob --hostname "$${HOSTNAME}"']
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 200s
+      start_period: 30s
     restart: always
     depends_on:
       <<: *airflow-common-depends-on
@@ -186,7 +182,6 @@ services:
     <<: *airflow-common
     command: celery worker
     healthcheck:
-      disable: false
       # yamllint disable rule:line-length
       test:
         - "CMD-SHELL"
@@ -194,7 +189,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 200s
+      start_period: 30s
     environment:
       <<: *airflow-common-env
       # Required to handle warm shutdown of the celery workers properly
@@ -212,12 +207,11 @@ services:
     <<: *airflow-common
     command: triggerer
     healthcheck:
-      disable: false
       test: ["CMD-SHELL", 'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"']
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 200s
+      start_period: 30s
     restart: always
     depends_on:
       <<: *airflow-common-depends-on
