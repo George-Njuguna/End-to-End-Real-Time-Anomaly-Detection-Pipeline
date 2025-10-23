@@ -1,5 +1,5 @@
 services:
-  postgres:
+  fraud_postgres:
     container_name: data_postgres
     image: postgres:14
     environment:
