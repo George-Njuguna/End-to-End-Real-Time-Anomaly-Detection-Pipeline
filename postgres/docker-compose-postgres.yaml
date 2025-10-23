@@ -25,7 +25,5 @@ services:
     restart: always
 
 networks:
-  default:
-    name: postgres_default
   fraud_network:
-    external: true    
+    external: true   
