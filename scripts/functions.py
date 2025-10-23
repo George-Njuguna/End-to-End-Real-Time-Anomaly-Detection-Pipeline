@@ -155,8 +155,7 @@ def create_table( conn, table_name ):
                     v27 DOUBLE PRECISION,
                     v28 DOUBLE PRECISION,
                     ammount NUMERIC(10,2) NOT NULL,
-                    fraud SMALLINT NOT NULL,
-                    timestamp TIMESTAMP NOT NULL
+                    fraud SMALLINT NOT NULL
                 );
             """)
             conn.commit()
