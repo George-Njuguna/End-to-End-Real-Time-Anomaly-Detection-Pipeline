@@ -221,10 +221,10 @@ def import_data(table_name, engine):
     """
     try:
         df = pd.read_sql(f"SELECT * FROM {table_name}", engine)
-        print(" DATA SUCCESFULLY LOADED ")
+        print("✅  DATA SUCCESFULLY LOADED ")
         return df
     except Exception as e:
-            print(" ERROR : COULD NOT LOAD DATA FROM DATABASE : ", e)
+            print("❌ ERROR : COULD NOT LOAD DATA FROM DATABASE : ", e)
 
 
 
