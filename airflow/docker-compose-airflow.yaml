@@ -175,6 +175,9 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    networks:
+      - default
+      - fraud_network
 
   airflow-worker:
     <<: *airflow-common
@@ -200,6 +203,9 @@ services:
         condition: service_healthy
       airflow-init:
         condition: service_completed_successfully
+    networks:
+      - default
+      - fraud_network
 
   airflow-triggerer:
     <<: *airflow-common
@@ -215,6 +221,9 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    networks:
+      - default
+      - fraud_network
 
   airflow-init:
     <<: *airflow-common

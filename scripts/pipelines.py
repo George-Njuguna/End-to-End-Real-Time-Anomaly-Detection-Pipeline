@@ -38,7 +38,7 @@ def load_to_postgress(df , table_name):
             dbname=os.getenv('POSTGRES_DB'),
             user=os.getenv('POSTGRES_USER'),
             password=os.getenv('POSTGRES_PW'),
-            host = 'fraud_postgres',#os.getenv('POSTGRES_HOST'),
+            host = os.getenv('POSTGRES_HOST'),
             port=os.getenv('POSTGRES_PORT')
         )
         print('✅ Connection made')
