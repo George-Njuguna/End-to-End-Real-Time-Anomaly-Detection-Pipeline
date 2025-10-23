@@ -1,6 +1,6 @@
 services:
-  fraud_postgres:
-    container_name: data_postgres
+  postgres:
+    container_name: fraud_postgres
     image: postgres:14
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
