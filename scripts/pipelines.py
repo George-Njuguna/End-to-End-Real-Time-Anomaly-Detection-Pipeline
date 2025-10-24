@@ -87,7 +87,7 @@ def modeling_pipe(data, imbalance_handling):
      # getting data parameters
     data_version = f"From Transaction ID {data.iloc[0,0]} To {data.iloc[-1,0]}"
     rows_number = len(data)
-    columns = list(data.iloc[:,2,-2].columns)
+    columns = list(data.iloc[:,2:-2].columns)
 
      # splitting variables(dependent, independent)
     X, y = split_func(data)

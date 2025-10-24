@@ -103,8 +103,8 @@ def split_func(df):
     """ 
 
     try:
-        X = df.iloc[ :,2:-2 ]
-        y = df.iloc[ :,-2 ]
+        X = df.iloc[ :,2:-1 ]
+        y = df.iloc[ :,-1 ]
         return X, y
     except Exception as e:
         print(" ERROR : COULD NOT SPLIT TO VARIABLES : ", e)
