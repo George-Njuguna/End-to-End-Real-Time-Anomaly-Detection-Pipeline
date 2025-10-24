@@ -204,7 +204,7 @@ def load_data(conn, df, table_name):
 
 
  # Importing data from postgres
-def import_data(table_name, engine):
+def import_data(table_name, conn):
     if not isinstance(table_name, str):
         raise ValueError("Input 'table_name' should be a string repin the table name")
     """    
@@ -220,7 +220,7 @@ def import_data(table_name, engine):
     df : pd.Dataframe
     """
     try:
-        df = pd.read_sql(f"SELECT * FROM {table_name}", engine)
+        df = pd.read_sql(f"SELECT * FROM {table_name}", conn)
         print("✅  DATA SUCCESFULLY LOADED ")
         return df
     except Exception as e:
