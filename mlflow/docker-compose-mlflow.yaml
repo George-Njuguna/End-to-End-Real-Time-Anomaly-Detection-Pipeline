@@ -72,6 +72,7 @@ services:
       # Backend store URI built from vars
       MLFLOW_BACKEND_STORE_URI: ${MLFLOW_BACKEND_STORE_URI}
 
+
       # S3/MinIO settings
       MLFLOW_S3_ENDPOINT_URL: ${MLFLOW_S3_ENDPOINT_URL}
       AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
@@ -82,6 +83,7 @@ services:
       # Server host/port
       MLFLOW_HOST: ${MLFLOW_HOST}
       MLFLOW_PORT: ${MLFLOW_PORT}
+      MLFLOW_SERVER_ALLOWED_HOSTS:: "mlflow,localhost,127.0.0.1"
     networks:
       - fraud_network
 
@@ -92,9 +94,7 @@ services:
           --backend-store-uri ${MLFLOW_BACKEND_STORE_URI} \
           --default-artifact-root ${MLFLOW_DEFAULT_ARTIFACT_ROOT} \
           --host 0.0.0.0 \
-          --port ${MLFLOW_PORT} \
-          --app-host 0.0.0.0 \
-          --allowed-hosts '*'
+          --port ${MLFLOW_PORT}    
       "
 
     ports:
