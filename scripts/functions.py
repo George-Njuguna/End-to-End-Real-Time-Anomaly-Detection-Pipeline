@@ -213,7 +213,7 @@ def import_data(table_name, conn):
     Parameters
     ----------
     table_name : name of the table in the database
-    engine : connection to the dataframe 
+    conn : connection to the dataframe 
 
     Returns
     -------
