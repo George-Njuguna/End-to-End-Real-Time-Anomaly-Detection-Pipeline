@@ -225,6 +225,8 @@ def import_data(table_name, conn):
         return df
     except Exception as e:
             print("❌ ERROR : COULD NOT LOAD DATA FROM DATABASE : ", e)
+    finally:
+        conn.close()
 
 
 

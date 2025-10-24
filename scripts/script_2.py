@@ -9,8 +9,8 @@ from mlflow.tracking import MlflowClient
 load_dotenv()
 client = MlflowClient()
 
-table_name = 'transactions_train_raw'
-tracking_uri = "http://mlflow:5000"
+table_name = 'Transactions'
+tracking_uri = "http://mlflow:5001"
 experiment_name = "Fraud_Detection_test"
 model_name = "fraud_detection_test"
 artifact_path = "fraud_model_test"
@@ -23,7 +23,9 @@ engine = create_engine(
     )
 
  # importing the data for training
-train_data = import_data( table_name, engine )
+conn = engine.raw_connection()
+
+train_data = import_data( table_name, conn )
 
  # Training the model
 model1 = modeling_pipe(train_data, False)
