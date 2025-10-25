@@ -139,7 +139,7 @@ def get_best_run_from_domain(domain, metric, tracking_uri):
                     best_run = run
 
         if best_run is None:
-            print(f"No runs with metric '{metric:.4f}' found in domain '{domain}'.")
+            print(f"No runs with metric '{metric}' found in domain '{domain}'.")
             return None
 
         best_run_id = best_run.info.run_id
