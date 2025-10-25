@@ -65,7 +65,7 @@ def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling, mo
             else:
                 mlflow.set_tag("Imbalance Handling", "SMOTE")
 
-            mlflow.set_tag("Trained_at", f"{timestamp}")
+            mlflow.set_tag("Trained_at ", f"{timestamp}")
             mlflow.set_tag("domain", domain)
 
             
