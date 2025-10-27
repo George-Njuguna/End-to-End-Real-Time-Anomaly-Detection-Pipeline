@@ -23,6 +23,7 @@ services:
     networks:
       - fraud_network
 
+
   kafka-2:
     image: apache/kafka:latest
     container_name: kafka-2
@@ -44,6 +45,8 @@ services:
       - ./data2:/var/lib/kafka/data
     networks:
       - fraud_network
+    depends_on:
+      - kafka-1
 
   kafka-3:
     image: apache/kafka:latest
@@ -66,6 +69,8 @@ services:
       - ./data3:/var/lib/kafka/data
     networks:
       - fraud_network
+    depends_on:
+      - kafka-2
 
 networks:
   fraud_network:
