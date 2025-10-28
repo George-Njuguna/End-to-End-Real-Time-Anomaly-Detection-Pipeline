@@ -36,9 +36,8 @@ untracked_files/
 .DS_Store
 Thumbs.db
 
-# Ignore the entire config folder
+# Ignore the entire folders
 config/
-
-data1
-data2
-data3
+kafka/data1/
+kafka/data2/
+kafka/data3/
