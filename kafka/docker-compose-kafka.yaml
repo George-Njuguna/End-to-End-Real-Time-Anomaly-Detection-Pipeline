@@ -22,6 +22,11 @@ services:
       - ./data1:/var/lib/kafka/data
     networks:
       - fraud_network
+    healthcheck:
+      test: ["CMD-SHELL", "ss -ltnp | grep 9092 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
 
 
   kafka-2:
@@ -45,6 +50,11 @@ services:
       - ./data2:/var/lib/kafka/data
     networks:
       - fraud_network
+    healthcheck:
+      test: ["CMD-SHELL", "ss -ltnp | grep 9092 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
     depends_on:
       - kafka-1
 
@@ -69,8 +79,24 @@ services:
       - ./data3:/var/lib/kafka/data
     networks:
       - fraud_network
+    healthcheck:
+      test: ["CMD-SHELL", "ss -ltnp | grep 9092 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
     depends_on:
       - kafka-2
+
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "8085:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka-1:9092,kafka-2:9092,kafka-3:9092
+    networks:
+      - fraud_network
 
 networks:
   fraud_network:
