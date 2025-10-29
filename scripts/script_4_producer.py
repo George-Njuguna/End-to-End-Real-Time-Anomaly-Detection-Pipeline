@@ -5,8 +5,7 @@ import os
 import json
 import time 
 
-tracking_uri = "http://mlflow:5001"
-model_name = "fraud_detection_test"
+
 table_name = 'Transactions'
 
 
