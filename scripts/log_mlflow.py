@@ -238,6 +238,34 @@ def update_production_model(model_name, best_run_id, artifact_path, curr_prod_id
     except Exception as e:
         print("ERROR in update_production_model ", e)
 
+
+ # Getting the production model 
+def load_production_model(model_name, tracking_uri):
+    """
+    Loads the current Production model (by alias) from MLflow Model Registry 
+    and returns both the model and its metadata.
+    """
+    mlflow.set_tracking_uri(tracking_uri)
+    client = MlflowClient()
+
+    try:
+        prod_model = client.get_model_version_by_alias(model_name, "Production")
+        
+        run_id = prod_model.run_id
+        version = prod_model.version
+        
+        print(f"✅ Loaded Production model for '{model_name}' (version {version}, run_id: {run_id})")
+
+        # Load model for inference
+        model = mlflow.pyfunc.load_model(model_uri=f"models:/{model_name}@Production")
+
+        return model, run_id, version
+
+    except Exception as e:
+        print(f"❌ Failed to load Production model for '{model_name}': {e}")
+        return None, None, None
+
+
             
 
         
