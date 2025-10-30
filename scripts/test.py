@@ -22,7 +22,7 @@ test_data = import_data( table_name, conn )
 
 model, run_id, version = load_production_model(model_name, tracking_uri)
 
-predictions = model(test_data)
+predictions = model.predict(test_data)
 
 # Append predictions
 test_data["prediction"] = predictions
