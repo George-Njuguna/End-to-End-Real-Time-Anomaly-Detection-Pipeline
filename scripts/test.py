@@ -1,14 +1,15 @@
 from log_mlflow import load_production_model
-from functions import split_func
-from functions import import_data
+from functions import split_func, create_prediction_table, import_data, load_data
 import psycopg2
 import pandas as pd
 import os 
 
 
 tracking_uri = "http://mlflow:5001"
+new_table_name = "predictions"
 model_name = "fraud_detection_test"
-table_name = "streaming_data"
+table_name1 = "streaming_data"
+table_name2 = "transactions"
 
  # Connecting to database 
 conn = psycopg2.connect(
@@ -19,23 +20,32 @@ conn = psycopg2.connect(
     port=os.getenv('POSTGRES_PORT')
 )
 
-test_data = import_data( table_name, conn )
+test_data = import_data( table_name1, conn )
 
 model, run_id, version = load_production_model(model_name, tracking_uri)
 
-X, y = split_func(test_data)
+column = test_data['time_seconds']
 
-predictions = model.predict(X)
-probabilities = model.predict_proba(X)[:, 1] * 100
+test_data, y = split_func(test_data)
+
+predictions = model.predict(test_data)
+probabilities = model.predict_proba(test_data)[:, 1] * 100
 
  # appending the true fraud
-X['fraud'] = y
+test_data['fraud'] = y
+test_data['time_seconds'] = column
+
+# loading to the transaction table for future remodelling 
+#load_data(conn, test_data, table_name2) 
 
 # Append predictions
-X["prediction"] = predictions
-X["probability"] = probabilities
+test_data["prediction"] = predictions
+test_data["probability"] = probabilities
 
-print(X.head(10))
+# loading the data
+create_prediction_table(conn, new_table_name)
+#load_data(conn, test_data, new_table_name)
+
 
 def main():
     print("END OF INFERENCE ")
