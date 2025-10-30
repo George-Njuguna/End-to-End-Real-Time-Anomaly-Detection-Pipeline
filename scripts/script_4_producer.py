@@ -6,7 +6,7 @@ import json
 import time 
 
 
-table_name = 'Transactions'
+table_name = 'streaming_data'
 
 
 
