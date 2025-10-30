@@ -1,4 +1,5 @@
 from log_mlflow import load_production_model
+from functions import split_func
 from functions import import_data
 import psycopg2
 import pandas as pd
@@ -22,12 +23,19 @@ test_data = import_data( table_name, conn )
 
 model, run_id, version = load_production_model(model_name, tracking_uri)
 
-predictions = model.predict(test_data)
+X, y = split_func(test_data)
+
+predictions = model.predict(X)
+probabilities = model.predict_proba(X)[:, 1] * 100
+
+ # appending the true fraud
+X['fraud'] = y
 
 # Append predictions
-test_data["prediction"] = predictions
+X["prediction"] = predictions
+X["probability"] = probabilities
 
-print(test_data.head(10))
+print(X.head(10))
 
 def main():
     print("END OF INFERENCE ")

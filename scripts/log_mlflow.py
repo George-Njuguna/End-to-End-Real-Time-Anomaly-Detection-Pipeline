@@ -239,7 +239,8 @@ def update_production_model(model_name, best_run_id, artifact_path, curr_prod_id
         print("ERROR in update_production_model ", e)
 
 
- # Getting the production model 
+
+
 def load_production_model(model_name, tracking_uri):
     """
     Loads the current Production model (by alias) from MLflow Model Registry 
@@ -249,15 +250,16 @@ def load_production_model(model_name, tracking_uri):
     client = MlflowClient()
 
     try:
+        # Get model version tagged as Production
         prod_model = client.get_model_version_by_alias(model_name, "Production")
-        
         run_id = prod_model.run_id
         version = prod_model.version
-        
+
         print(f"✅ Loaded Production model for '{model_name}' (version {version}, run_id: {run_id})")
 
-        # Load model for inference
-        model = mlflow.pyfunc.load_model(model_uri=f"models:/{model_name}@Production")
+        # Load the sklearn model (not pyfunc)
+        model_uri = f"models:/{model_name}@Production"
+        model = mlflow.sklearn.load_model(model_uri=model_uri)
 
         return model, run_id, version
 
