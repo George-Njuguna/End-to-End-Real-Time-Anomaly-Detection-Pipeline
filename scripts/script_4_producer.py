@@ -9,7 +9,6 @@ import time
 table_name = 'streaming_data'
 
 
-
  # Connecting to database 
 conn = psycopg2.connect(
     dbname=os.getenv('POSTGRES_DB'),
