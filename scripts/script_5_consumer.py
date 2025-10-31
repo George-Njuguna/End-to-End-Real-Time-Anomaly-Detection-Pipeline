@@ -1,5 +1,8 @@
 from log_mlflow import load_production_model
+from functions import split_func, create_prediction_table, import_data, load_data
 from kafka import KafkaConsumer
+from datetime import datetime, timedelta
+import pendulum 
 import json
 import psycopg2
 import pandas as pd
@@ -8,6 +11,7 @@ import os
 tracking_uri = "http://mlflow:5001"
 model_name = "fraud_detection_test"
 table_name = "infered_transactions"
+model_name = "fraud_detection_test"
 
  # Connecting to database 
 conn = psycopg2.connect(
@@ -22,6 +26,9 @@ model, run_id, version = load_production_model(model_name, tracking_uri)
 
 cursor = conn.cursor()
 
+last_flush = datetime.now()
+flush_interval = timedelta(seconds=30)
+
 # Kafka Consumer setup
 consumer = KafkaConsumer(
     'transactions',
@@ -35,42 +42,52 @@ consumer = KafkaConsumer(
 batch = []
 batch_size = 1000
 
+no_msg_count = 0
+max_empty_polls = 10 
+
 print("Consumer running...")
 
-for message in consumer:
-    event = message.value
-    batch.append(event)
 
-    if len(batch) >= batch_size:
-        print(f"Processing batch of {len(batch)} transactions...")
 
-        # Convert to DataFrame
-        df = pd.DataFrame(batch)
+while True:
+    msg_pack = consumer.poll(timeout_ms=1000)  
+    if not msg_pack:
+        no_msg_count += 1
+        if no_msg_count >= max_empty_polls:
+            print("No new messages — stopping consumer.")
+            break
+        continue
+    no_msg_count = 0  
 
-        # Model inference
-        predictions = model(df)
+    for message in consumer:
+        event = message.value
+        event["processed_at"] = pendulum.now("Africa/Nairobi").format("YYYY-MM-DD HH:mm:ss")
+        batch.append(event)
 
-        # Append predictions
-        df["prediction"] = predictions
+        if len(batch) >= batch_size or datetime.now() - last_flush > flush_interval:
+            print(f"Processing batch of {len(batch)} transactions...")
 
-        # Bulk insert into PostgreSQL
-        for _, row in df.iterrows():
-            cursor.execute("""
-                INSERT INTO processed_transactions
-                (transaction_id, user_id, amount, timestamp, location, device_type, prediction)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT (transaction_id) DO NOTHING;
-            """, (
-                row["transaction_id"],
-                row["user_id"],
-                row["amount"],
-                row["timestamp"],
-                row["location"],
-                row["device_type"],
-                row["prediction"]
-            ))
+            # Convert to DataFrame
+            df = pd.DataFrame(batch)
 
-        conn.commit()
-        print(f"✅ Inserted {len(batch)} records into processed_transactions.")
+            column = df['time_seconds']
 
-        batch.clear()
+            test_data, y = split_func(df)
+
+            predictions = model.predict(test_data)
+            probabilities = model.predict_proba(test_data)[:, 1] * 100
+
+            # appending the true fraud
+            test_data['fraud'] = y
+            test_data['time_seconds'] = column
+
+            # Append predictions
+            test_data["prediction"] = predictions
+            test_data["probability"] = probabilities
+
+            # loading the data
+            create_prediction_table(conn, table_name)
+            load_data(conn, test_data, table_name)
+
+            batch.clear()
+            last_flush = datetime.now()
