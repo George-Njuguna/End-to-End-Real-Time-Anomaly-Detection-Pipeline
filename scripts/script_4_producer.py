@@ -7,7 +7,7 @@ import time
 
 
 table_name = 'streaming_data'
-
+messages = 0
 
  # Connecting to database 
 conn = psycopg2.connect(
@@ -20,9 +20,14 @@ conn = psycopg2.connect(
 
 # Kafka Producer setup
 producer = KafkaProducer(
-    bootstrap_servers=["kafka-1:9092", "kafka-2:9092", "kafka-3:9092"],
-    value_serializer=lambda v: json.dumps(v).encode('utf-8')
+    bootstrap_servers=['kafka-1:9092','kafka-2:9092','kafka-3:9092'],
+    value_serializer=lambda v: json.dumps(v).encode('utf-8'),
+    acks='all',         
+    linger_ms=5,          
+    batch_size=32768,     
+    compression_type='lz4' 
 )
+
 
 if __name__ == "__main__":
     print("Producer started...")
@@ -34,8 +39,9 @@ if __name__ == "__main__":
 
         for txn in transactions:
             producer.send("transactions", txn)
-            print(f"Produced: {txn}")
-            time.sleep(0.5)
+            messages += 1
+            time.sleep(0.3)
+        print(f'Produced {messages} messages...')
 
     producer.flush()
     producer.close()
