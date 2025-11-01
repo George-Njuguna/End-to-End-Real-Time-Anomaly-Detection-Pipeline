@@ -7,6 +7,7 @@ import time
 
 
 table_name = 'streaming_data'
+table2 = "streaming_data_test"
 msg_count= 0
 
  # Connecting to database 
@@ -32,7 +33,7 @@ producer = KafkaProducer(
 if __name__ == "__main__":
     print("Producer started...")
     while True:
-        transactions = fetch_batch_data(table_name, 1000, conn) 
+        transactions = fetch_batch_data(table2, 1000, conn) 
         if not transactions:
             print("✅ No more transactions left to stream. Stopping producer.")
             break 
