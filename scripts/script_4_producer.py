@@ -7,7 +7,7 @@ import time
 
 
 table_name = 'streaming_data'
-messages = 0
+msg_count= 0
 
  # Connecting to database 
 conn = psycopg2.connect(
@@ -39,9 +39,9 @@ if __name__ == "__main__":
 
         for txn in transactions:
             producer.send("transactions", txn)
-            messages += 1
+            msg_count += 1
             time.sleep(0.3)
-        print(f'Produced {messages} messages...')
+        print(f'Produced {msg_count} messages...')
 
     producer.flush()
     producer.close()
