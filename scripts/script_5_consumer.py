@@ -32,7 +32,7 @@ flush_interval = timedelta(seconds=30)
 # Kafka Consumer setup
 consumer = KafkaConsumer(
     'transactions',
-    bootstrap_servers='localhost:9092',
+    bootstrap_servers=["kafka-1:9092", "kafka-2:9092", "kafka-3:9092"],
     auto_offset_reset='earliest',
     enable_auto_commit=True,
     group_id='fraud-detectors',
