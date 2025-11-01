@@ -47,7 +47,7 @@ max_empty_polls = 10
 
 print("Consumer running...")
 
-create_prediction_table(conn, table_name)
+
 
 while True:
     msg_pack = consumer.poll(timeout_ms=1000)  
