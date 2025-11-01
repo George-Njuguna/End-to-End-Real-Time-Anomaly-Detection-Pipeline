@@ -47,7 +47,8 @@ max_empty_polls = 10
 
 print("Consumer running...")
 
-
+# creating the table if does not exist
+create_prediction_table(conn, table_name) 
 
 while True:
     msg_pack = consumer.poll(timeout_ms=1000)  
@@ -55,6 +56,7 @@ while True:
         no_msg_count += 1
         if no_msg_count >= max_empty_polls:
             print("No new messages — stopping consumer.")
+            conn.close()
             break
         continue
     no_msg_count = 0  
