@@ -47,7 +47,7 @@ max_empty_polls = 10
 
 print("Consumer running...")
 
-
+create_prediction_table(conn, table_name)
 
 while True:
     msg_pack = consumer.poll(timeout_ms=1000)  
@@ -86,7 +86,6 @@ while True:
             test_data["probability"] = probabilities
 
             # loading the data
-            create_prediction_table(conn, table_name)
             load_data(conn, test_data, table_name)
 
             batch.clear()
