@@ -31,26 +31,32 @@ producer = KafkaProducer(
     compression_type='lz4' 
 )
 
+print("Producer started...")
 
-if __name__ == "__main__":
-    print("Producer started...")
-    while True:
-        transactions = fetch_batch_data(table2, 1000, conn)
-        batches+=1000
-        print(f"....Imported {batches} data.....")
-        if not transactions:
-            print("✅ No more transactions left to stream. Stopping producer.")
-            break 
+while True:
+    transactions = fetch_batch_data(table2, 1000, conn)
+    batches+=1000
+    print(f"....Imported {batches} data.....")
+    if not transactions:
+        print("✅ No more transactions left to stream. Stopping producer.")
+        break 
 
-        for txn in transactions:
-            producer.send("transactions", txn)
-            msg_count += 1
-            time.sleep(0.3)
-        print(f'Produced {msg_count} messages...')
+    for txn in transactions:
+        producer.send("transactions", txn)
+        msg_count += 1
+        time.sleep(0.3)
+    print(f'Produced {msg_count} messages...')
 
-    producer.flush()
-    producer.close()
-    conn.close()
+producer.flush()
+producer.close()
+conn.close()
+
+def main():
+    print(".....END OF THE PRODUCER....")
+    
+if __name__ == '__main__':
+    main()
+
 
 
 
