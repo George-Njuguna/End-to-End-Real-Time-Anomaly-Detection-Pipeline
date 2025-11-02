@@ -38,6 +38,6 @@ Thumbs.db
 
 # Ignore the entire folders
 config/
-kafka/data1/
-kafka/data2/
-kafka/data3/
+kafka/data_1/
+kafka/data_2/
+kafka/data_3/

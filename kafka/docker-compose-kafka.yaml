@@ -18,7 +18,7 @@ services:
       KAFKA_LOG_DIRS: /var/lib/kafka/data
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
     volumes:
-      - ./data1:/var/lib/kafka/data
+      - ./data_1:/var/lib/kafka/data
     networks:
       - fraud_network
     healthcheck:
@@ -46,7 +46,7 @@ services:
       KAFKA_LOG_DIRS: /var/lib/kafka/data
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
     volumes:
-      - ./data2:/var/lib/kafka/data
+      - ./data_2:/var/lib/kafka/data
     networks:
       - fraud_network
     healthcheck:
@@ -75,7 +75,7 @@ services:
       KAFKA_LOG_DIRS: /var/lib/kafka/data
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
     volumes:
-      - ./data3:/var/lib/kafka/data
+      - ./data_3:/var/lib/kafka/data
     networks:
       - fraud_network
     healthcheck:
