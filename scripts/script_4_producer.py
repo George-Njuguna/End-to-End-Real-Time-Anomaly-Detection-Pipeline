@@ -38,15 +38,18 @@ while True:
     transactions = fetch_batch_data(table2, 1000, conn, last_id)
     if not transactions:
         print("✅ No more transactions left to stream. Stopping producer.")
-        break 
-    
-    batches+=1000
+        break
+
+    batches += len(transactions)
     print(f"....Imported {batches} data.....")
+
     for txn in transactions:
         producer.send("transactions", txn)
         msg_count += 1
+        last_id = txn["transaction_id"] 
         time.sleep(0.3)
-    print(f'Produced {msg_count} messages...')
+
+    print(f"Produced {msg_count} messages so far...")
 
 producer.flush()
 producer.close()
