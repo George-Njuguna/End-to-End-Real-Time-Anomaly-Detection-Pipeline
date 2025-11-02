@@ -181,7 +181,7 @@ def create_prediction_table( conn, table_name ):
             cur.execute(f"""
                 CREATE TABLE IF NOT EXISTS {table_name} (
                     transaction_id SERIAL PRIMARY KEY,
-                    processed_at TIMESTAMPTZ PRIMARY KEY,   
+                    processed_at TIMESTAMPTZ,   
                     time_seconds INT NOT NULL,                      
                     v1 DOUBLE PRECISION,
                     v2 DOUBLE PRECISION,
