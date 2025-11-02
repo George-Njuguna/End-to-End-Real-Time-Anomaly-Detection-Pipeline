@@ -7,7 +7,6 @@ with DAG(
     dag_id="run_producer",
     start_date=datetime(2025, 1, 1, tzinfo=timezone("Africa/Nairobi")),
     schedule="0 10 * * 2",
-    retries=0,
     catchup=False
 ) as dag:
 
