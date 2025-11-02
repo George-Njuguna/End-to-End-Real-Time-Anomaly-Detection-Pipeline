@@ -51,44 +51,39 @@ print("Consumer running...")
 create_prediction_table(conn, table_name) 
 
 while True:
-    msg_pack = consumer.poll(timeout_ms=1000)  
+    msg_pack = consumer.poll(timeout_ms=1000)
+
     if not msg_pack:
         no_msg_count += 1
         if no_msg_count >= max_empty_polls:
             print("No new messages — stopping consumer.")
-            conn.close()
             break
         continue
-    no_msg_count = 0  
 
-    for message in consumer:
-        event = message.value
-        event["processed_at"] = pendulum.now("Africa/Nairobi").format("YYYY-MM-DD HH:mm:ss")
-        batch.append(event)
+    no_msg_count = 0
 
-        if len(batch) >= batch_size or datetime.now() - last_flush > flush_interval:
-            print(f"Processing batch of {len(batch)} transactions...")
+    for tp, messages in msg_pack.items():
+        for message in messages:
+            event = message.value
+            event["processed_at"] = pendulum.now("Africa/Nairobi").format("YYYY-MM-DD HH:mm:ss")
+            batch.append(event)
 
-            # Convert to DataFrame
-            df = pd.DataFrame(batch)
+    if len(batch) >= batch_size or datetime.now() - last_flush > flush_interval:
+        print(f"Processing batch of {len(batch)} transactions...")
 
-            column = df['time_seconds']
+        df = pd.DataFrame(batch)
+        column = df['time_seconds']
 
-            test_data, y = split_func(df)
+        test_data, y = split_func(df)
+        predictions = model.predict(test_data)
+        probabilities = model.predict_proba(test_data)[:, 1] * 100
 
-            predictions = model.predict(test_data)
-            probabilities = model.predict_proba(test_data)[:, 1] * 100
+        test_data['fraud'] = y
+        test_data['time_seconds'] = column
+        test_data['prediction'] = predictions
+        test_data['probability'] = probabilities
 
-            # appending the true fraud
-            test_data['fraud'] = y
-            test_data['time_seconds'] = column
+        load_data(conn, test_data, table_name)
 
-            # Append predictions
-            test_data["prediction"] = predictions
-            test_data["probability"] = probabilities
-
-            # loading the data
-            load_data(conn, test_data, table_name)
-
-            batch.clear()
-            last_flush = datetime.now()
+        batch.clear()
+        last_flush = datetime.now()
