@@ -10,6 +10,7 @@ table_name = 'streaming_data'
 table2 = "streaming_data_test"
 msg_count= 0
 batches= 0
+last_id = 0
 
  # Connecting to database 
 conn = psycopg2.connect(
@@ -34,7 +35,7 @@ producer = KafkaProducer(
 print("Producer started...")
 
 while True:
-    transactions = fetch_batch_data(table2, 1000, conn)
+    transactions = fetch_batch_data(table2, 1000, conn, last_id)
     if not transactions:
         print("✅ No more transactions left to stream. Stopping producer.")
         break 

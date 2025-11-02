@@ -59,27 +59,24 @@ def load_to_postgress(df , table_name):
             print("🔌 CONNECTION CLOSED")
 
  # Fetching batches of data from postgress
-def fetch_batch_data(table_name, batch_size, conn):
+def fetch_batch_data(table_name, batch_size, conn, last_id=0):
     """
-    imports Data from Postgress in batches 
-    
-    parameters
-    ----------
-    table_name = table name where the data is stored in postgress
-    batch_size - the batch number of the data requred to be imported
-    conn = the postgress server connection 
-    
-    Returns
-    -------
-    list of dictionaries serialized 
+    Imports data from PostgreSQL in batches, fetching only new rows
+    based on transaction_id > last_id.
     """
     try:
-        query = f"SELECT * FROM {table_name} ORDER BY transaction_id LIMIT {batch_size};"
+        query = f"""
+            SELECT * FROM {table_name}
+            WHERE transaction_id > {last_id}
+            ORDER BY transaction_id
+            LIMIT {batch_size};
+        """
         df = pd.read_sql(query, conn)
-
         return df.to_dict(orient="records")
     except Exception as e:
-        print(f'❌ ERROR IN fetch_data', e )
+        print(f"❌ ERROR in fetch_batch_data: {e}")
+        return []
+
 
 
 
