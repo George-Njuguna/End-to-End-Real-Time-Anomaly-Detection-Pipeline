@@ -56,7 +56,27 @@ while True:
     if not msg_pack:
         no_msg_count += 1
         if no_msg_count >= max_empty_polls:
-            print("No new messages — stopping consumer.")
+            print("No new messages — finalizing remaining batch if any...")
+            if batch:  
+                print(f"Final flush: Processing remaining {len(batch)} transactions...")
+                df = pd.DataFrame(batch)
+                column1 = df['time_seconds']
+                column2 = df["processed_at"]
+
+                test_data, y = split_func(df)
+                predictions = model.predict(test_data)
+                probabilities = model.predict_proba(test_data)[:, 1] * 100
+
+                test_data['fraud'] = y
+                test_data['time_seconds'] = column1
+                test_data["processed_at"] = column2
+                test_data['prediction'] = predictions
+                test_data['probability'] = probabilities
+
+                load_data(conn, test_data, table_name)
+                batch.clear()
+
+            print("✅ No more messages — stopping consumer.")
             break
         continue
 
@@ -65,24 +85,25 @@ while True:
     for tp, messages in msg_pack.items():
         for message in messages:
             event = message.value
-            event["processed_at"] = pendulum.now("Africa/Nairobi").in_timezone("UTC")
+            event["processed_at"] = pendulum.now("Africa/Nairobi").format("YYYY-MM-DD HH:mm:ss")
             batch.append(event)
 
     if len(batch) >= batch_size or datetime.now() - last_flush > flush_interval:
         print(f"Processing batch of {len(batch)} transactions...")
 
         df = pd.DataFrame(batch)
-        column = df['time_seconds']
+        column1 = df['time_seconds']
+        column2 = df["processed_at"]
 
         test_data, y = split_func(df)
         predictions = model.predict(test_data)
         probabilities = model.predict_proba(test_data)[:, 1] * 100
 
         test_data['fraud'] = y
-        test_data['time_seconds'] = column
+        test_data['time_seconds'] = column1
+        test_data["processed_at"] = column2
         test_data['prediction'] = predictions
         test_data['probability'] = probabilities
-        print(test_data.columns.tolist())
 
         #load_data(conn, test_data, table_name)
 
