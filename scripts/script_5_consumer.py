@@ -65,7 +65,7 @@ while True:
     for tp, messages in msg_pack.items():
         for message in messages:
             event = message.value
-            event["processed_at"] = pendulum.now("Africa/Nairobi").format("YYYY-MM-DD HH:mm:ss")
+            event["processed_at"] = pendulum.now("Africa/Nairobi").in_timezone("UTC")
             batch.append(event)
 
     if len(batch) >= batch_size or datetime.now() - last_flush > flush_interval:
@@ -82,8 +82,9 @@ while True:
         test_data['time_seconds'] = column
         test_data['prediction'] = predictions
         test_data['probability'] = probabilities
+        print(test_data.columns.tolist())
 
-        load_data(conn, test_data, table_name)
+        #load_data(conn, test_data, table_name)
 
         batch.clear()
         last_flush = datetime.now()
