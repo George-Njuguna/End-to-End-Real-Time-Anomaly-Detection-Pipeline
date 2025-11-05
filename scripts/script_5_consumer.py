@@ -105,7 +105,7 @@ while True:
         test_data['prediction'] = predictions
         test_data['probability'] = probabilities
 
-        #load_data(conn, test_data, table_name)
+        load_data(conn, test_data, table_name)
 
         batch.clear()
         last_flush = datetime.now()
