@@ -29,21 +29,27 @@ cursor = conn.cursor()
 last_flush = datetime.now()
 flush_interval = timedelta(seconds=30)
 
+
+
 # Kafka Consumer setup
 consumer = KafkaConsumer(
     'transactions',
     bootstrap_servers=["kafka-1:9092", "kafka-2:9092", "kafka-3:9092"],
     auto_offset_reset='earliest',
-    enable_auto_commit=True,
+    enable_auto_commit=False,
     group_id='fraud-detectors',
-    value_deserializer=lambda v: json.loads(v.decode('utf-8'))
+    value_deserializer=lambda v: json.loads(v.decode('utf-8')),
+    max_poll_records=2000,
+    max_poll_interval_ms=900000,  
+    session_timeout_ms=30000,
+    heartbeat_interval_ms=10000
 )
 
 batch = []
 batch_size = 1000
 
 no_msg_count = 0
-max_empty_polls = 10 
+max_idle_polls = 30
 
 print("Consumer running...")
 
@@ -53,12 +59,15 @@ create_prediction_table(conn, table_name)
 while True:
     msg_pack = consumer.poll(timeout_ms=1000)
 
+    # If no messages were returned this poll
     if not msg_pack:
         no_msg_count += 1
-        if no_msg_count >= max_empty_polls:
-            print("No new messages — finalizing remaining batch if any...")
-            if batch:  
-                print(f"Final flush: Processing remaining {len(batch)} transactions...")
+
+        # If we have seen no messages for many polls → assume no more new data
+        if no_msg_count >= max_idle_polls:
+            print("✅ No new messages for a while — assuming producer finished. Finalizing any remaining batch...")
+
+            if batch:
                 df = pd.DataFrame(batch)
                 column1 = df['time_seconds']
                 column2 = df["processed_at"]
@@ -69,27 +78,33 @@ while True:
 
                 test_data['fraud'] = y
                 test_data['time_seconds'] = column1
-                test_data["processed_at"] = column2
+                test_data['processed_at'] = column2
                 test_data['prediction'] = predictions
                 test_data['probability'] = probabilities
 
-                load_data(conn, test_data, table_name)
+                #load_data(conn, test_data, table_name)
+                consumer.commit()
                 batch.clear()
 
-            print("✅ No more messages — stopping consumer.")
+            print("✅ Consumer finished processing all messages. Stopping gracefully.")
             break
+
+        # No messages but not done yet → continue polling
         continue
 
+    # We received messages → reset idle counter
     no_msg_count = 0
 
+    # Add received messages to batch
     for tp, messages in msg_pack.items():
         for message in messages:
             event = message.value
             event["processed_at"] = pendulum.now("Africa/Nairobi").format("YYYY-MM-DD HH:mm:ss")
             batch.append(event)
 
-    if len(batch) >= batch_size or datetime.now() - last_flush > flush_interval:
-        print(f"Processing batch of {len(batch)} transactions...")
+    # Flush batch if size reached or if we've waited long enough
+    if len(batch) >= batch_size or (datetime.now() - last_flush) > flush_interval:
+        print(f"🟡 Processing batch of {len(batch)} transactions...")
 
         df = pd.DataFrame(batch)
         column1 = df['time_seconds']
@@ -101,11 +116,16 @@ while True:
 
         test_data['fraud'] = y
         test_data['time_seconds'] = column1
-        test_data["processed_at"] = column2
+        test_data['processed_at'] = column2
         test_data['prediction'] = predictions
         test_data['probability'] = probabilities
 
-        load_data(conn, test_data, table_name)
+        print("Columns being inserted:", test_data.columns.tolist())
+
+        #load_data(conn, test_data, table_name)
+        consumer.commit()
 
         batch.clear()
         last_flush = datetime.now()
+
+print("✅ Kafka consumer fully stopped.")
