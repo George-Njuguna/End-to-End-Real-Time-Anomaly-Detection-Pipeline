@@ -57,7 +57,7 @@ print("Consumer running...")
 create_prediction_table(conn, table_name) 
 
 while True:
-    msg_pack = consumer.poll(timeout_ms=1000)
+    msg_pack = consumer.poll(timeout_ms=5000)
 
     # If no messages were returned this poll
     if not msg_pack:

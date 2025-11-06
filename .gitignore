@@ -41,3 +41,7 @@ config/
 kafka/data_1/
 kafka/data_2/
 kafka/data_3/
+
+kafka/data1/
+kafka/data2/
+kafka/data3/
