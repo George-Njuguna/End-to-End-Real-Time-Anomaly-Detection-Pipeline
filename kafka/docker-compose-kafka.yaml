@@ -18,8 +18,11 @@ services:
       KAFKA_LOG_DIRS: /var/lib/kafka/data
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_ENABLE_TOPIC_DELETION: "true"
+
     volumes:
-      - ./data1:/var/lib/kafka/data
+    - type: tmpfs
+      target: /var/lib/kafka/data
+
     networks:
       - fraud_network
     healthcheck:
@@ -47,8 +50,11 @@ services:
       KAFKA_LOG_DIRS: /var/lib/kafka/data
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_ENABLE_TOPIC_DELETION: "true"
+
     volumes:
-      - ./data2:/var/lib/kafka/data
+    - type: tmpfs
+      target: /var/lib/kafka/data      
+
     networks:
       - fraud_network
     healthcheck:
@@ -77,8 +83,11 @@ services:
       KAFKA_LOG_DIRS: /var/lib/kafka/data
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_ENABLE_TOPIC_DELETION: "true"
+
     volumes:
-      - ./data3:/var/lib/kafka/data
+    - type: tmpfs
+      target: /var/lib/kafka/data
+
     networks:
       - fraud_network
     healthcheck:
