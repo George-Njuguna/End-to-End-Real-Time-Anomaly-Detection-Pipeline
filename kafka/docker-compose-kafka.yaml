@@ -17,6 +17,7 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_LOG_DIRS: /var/lib/kafka/data
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_ENABLE_TOPIC_DELETION: "true"
     volumes:
       - ./data1:/var/lib/kafka/data
     networks:
@@ -45,6 +46,7 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_LOG_DIRS: /var/lib/kafka/data
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_ENABLE_TOPIC_DELETION: "true"
     volumes:
       - ./data2:/var/lib/kafka/data
     networks:
@@ -74,6 +76,7 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_LOG_DIRS: /var/lib/kafka/data
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_ENABLE_TOPIC_DELETION: "true"
     volumes:
       - ./data3:/var/lib/kafka/data
     networks:
