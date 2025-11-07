@@ -82,7 +82,7 @@ while True:
                 test_data['prediction'] = predictions
                 test_data['probability'] = probabilities
 
-                #load_data(conn, test_data, table_name)
+                load_data(conn, test_data, table_name)
                 consumer.commit()
                 batch.clear()
 
@@ -104,7 +104,7 @@ while True:
 
     # Flush batch if size reached or if we've waited long enough
     if len(batch) >= batch_size or (datetime.now() - last_flush) > flush_interval:
-        print(f"🟡 Processing batch of {len(batch)} transactions...")
+        print(f" Processing batch of {len(batch)} transactions...")
 
         df = pd.DataFrame(batch)
         column1 = df['time_seconds']
@@ -122,7 +122,7 @@ while True:
 
         print("Columns being inserted:", test_data.columns.tolist())
 
-        #load_data(conn, test_data, table_name)
+        load_data(conn, test_data, table_name)
         consumer.commit()
 
         batch.clear()
