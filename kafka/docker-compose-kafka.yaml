@@ -20,11 +20,7 @@ services:
       KAFKA_ENABLE_TOPIC_DELETION: "true"
 
     volumes:
-      - type: tmpfs
-        target: /var/lib/kafka/data
-        tmpfs:
-          mode: 0777
-
+      - ./kafka-data/broker-1:/var/lib/kafka/data
     networks:
       - fraud_network
     healthcheck:
@@ -54,10 +50,7 @@ services:
       KAFKA_ENABLE_TOPIC_DELETION: "true"
 
     volumes:
-      - type: tmpfs
-        target: /var/lib/kafka/data
-        tmpfs:
-          mode: 0777      
+      - ./kafka-data/broker-2:/var/lib/kafka/data      
 
     networks:
       - fraud_network
@@ -89,10 +82,7 @@ services:
       KAFKA_ENABLE_TOPIC_DELETION: "true"
 
     volumes:
-      - type: tmpfs
-        target: /var/lib/kafka/data
-        tmpfs:
-          mode: 0777
+      - ./kafka-data/broker-3:/var/lib/kafka/data
 
     networks:
       - fraud_network
