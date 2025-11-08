@@ -21,7 +21,7 @@ conn = psycopg2.connect(
     port=os.getenv('POSTGRES_PORT')
 )
 
-# Kafka Producer setup
+# Kafka Producer 
 producer = KafkaProducer(
     bootstrap_servers=['kafka-1:9092','kafka-2:9092','kafka-3:9092'],
     value_serializer=lambda v: json.dumps(v).encode('utf-8'),
@@ -51,7 +51,7 @@ while True:
         msg_count += 1
         new_last_id = txn["transaction_id"]
 
-    #  deliver this batch BEFORE moving to next
+    #  flushing the batch
     producer.flush()
     last_id = new_last_id
 
