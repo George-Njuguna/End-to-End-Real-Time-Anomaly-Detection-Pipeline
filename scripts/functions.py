@@ -109,6 +109,45 @@ def split_func(df):
     except Exception as e:
         print(" ERROR : COULD NOT SPLIT TO VARIABLES : ", e)
 
+ # aligning columns arrangements
+def align_df_to_table(conn, df, table_name):
+    """
+    Aligns a DataFrame's columns to match the exact column order in a PostgreSQL table
+    (excluding SERIAL/AUTO columns such as transaction_id).
+    """
+    query = f"""
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_name = %s
+        ORDER BY ordinal_position;
+    """
+    
+    with conn.cursor() as cur:
+        cur.execute(query, (table_name,))
+        db_columns = [row[0] for row in cur.fetchall()]
+    
+    db_columns = [col for col in db_columns if col != "transaction_id"]
+    print('Colums order', db_columns)
+
+    df_columns = df.columns.tolist()
+    
+     # Cheking missing columns
+    missing = set(db_columns) - set(df_columns)
+    if missing:
+        raise ValueError(f"DataFrame is missing required columns: {missing}")
+    
+     # Checking extra columns
+    extra = set(df_columns) - set(db_columns)
+    if extra:
+        print(f"⚠️ DataFrame has extra columns not in table and will be ignored: {extra}")
+
+    # Reindex DF to correct order (dropping extra columns)
+    df = df[db_columns]
+    print("ordered database colums", df.columns.to_list)
+
+    print("✅ DataFrame successfully aligned to table column order")
+    return df
+
 
  # Creating table in postgress
 def create_table( conn, table_name ):  
@@ -243,7 +282,8 @@ def load_data(conn, df, table_name):
     """
     try:
         with conn.cursor() as cur:
-
+            df = align_df_to_table(conn, df, table_name) 
+            
             records = list(df.itertuples(index=False, name=None))
             columns = ', '.join(df.columns)
             
