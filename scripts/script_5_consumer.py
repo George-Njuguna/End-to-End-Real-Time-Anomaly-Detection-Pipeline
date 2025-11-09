@@ -72,6 +72,9 @@ while True:
                 column1 = df['time_seconds']
                 column2 = df["processed_at"]
 
+                #dropping the processed at 
+                df = df.drop("processed_at", axis=1)
+
                 test_data, y = split_func(df)
                 predictions = model.predict(test_data)
                 probabilities = model.predict_proba(test_data)[:, 1] * 100
@@ -81,7 +84,7 @@ while True:
                 test_data['processed_at'] = column2
                 test_data['prediction'] = predictions
                 test_data['probability'] = probabilities
-
+                
                 load_data(conn, test_data, table_name)
                 consumer.commit()
                 batch.clear()
@@ -89,10 +92,9 @@ while True:
             print("✅ Consumer finished processing all messages. Stopping gracefully.")
             break
 
-        # No messages but not done yet → continue polling
         continue
 
-    # We received messages → reset idle counter
+    # reset idle counter
     no_msg_count = 0
 
     # Add received messages to batch
@@ -110,6 +112,9 @@ while True:
         column1 = df['time_seconds']
         column2 = df["processed_at"]
 
+         # dropping processed data
+        df = df.drop("processed_at", axis=1)
+
         test_data, y = split_func(df)
         predictions = model.predict(test_data)
         probabilities = model.predict_proba(test_data)[:, 1] * 100
@@ -119,8 +124,6 @@ while True:
         test_data['processed_at'] = column2
         test_data['prediction'] = predictions
         test_data['probability'] = probabilities
-
-        print("Columns being inserted:", test_data.columns.tolist())
 
         load_data(conn, test_data, table_name)
         consumer.commit()
