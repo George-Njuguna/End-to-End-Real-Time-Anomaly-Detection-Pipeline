@@ -11,7 +11,7 @@ table2 = "streaming_data_test"
 msg_count= 0
 batches= 0
 last_id = 0
-msg_list = [2000,3000,4000,5000,6000,8000,7000]
+msg_list = [3000,4000,5000,6000,8000,7000]
 
  # Connecting to database 
 conn = psycopg2.connect(
@@ -38,7 +38,7 @@ print("Producer started...")
 while True:
     transactions = fetch_batch_data(table2, 1000, conn, last_id)
 
-    if not transactions:
+    if not transactions or msg_count == rd.choice(msg_list):
         print("✅ No more transactions left to stream. Stopping producer.")
         break
 
