@@ -104,7 +104,7 @@ while True:
             event["processed_at"] = pendulum.now("Africa/Nairobi").format("YYYY-MM-DD HH:mm:ss")
             batch.append(event)
 
-    # Flush batch if size reached or if we've waited long enough
+    # Flush batch 
     if len(batch) >= batch_size or (datetime.now() - last_flush) > flush_interval:
         print(f" Processing batch of {len(batch)} transactions...")
 
