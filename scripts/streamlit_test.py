@@ -1,21 +1,27 @@
-import streamlit as st 
+from pipelines import fetch_batch_data
+import psycopg2
+import pandas as pd
+import os 
 
 import streamlit as st
 
-st.title("User Profile Form")
 
-name = st.text_input("Enter your name:")
-age = st.number_input("Enter your age:", min_value=1, max_value=120)
-favorite_color = st.selectbox("Choose your favorite color:", ["Red", "Green", "Blue", "Yellow"])
-hobbies = st.multiselect("Select your hobbies:", ["Reading", "Coding", "Music", "Traveling"])
-rating = st.slider("How much do you like Streamlit?", 1, 10)
+# Connecting to database 
+conn = psycopg2.connect(
+    dbname=os.getenv('POSTGRES_DB'),
+    user=os.getenv('POSTGRES_USER'),
+    password="aninterludecalled",
+    host = "localhost",
+    port="5431"
+)
 
-submitted = st.button("Submit")
+df = fetch_batch_data('streaming_data' , 3000 , conn )
 
-if submitted:
-    st.write("### Profile Summary")
-    st.write(f"Name: {name}")
-    st.write(f"Age: {age}")
-    st.write(f"Favorite Color: {favorite_color}")
-    st.write(f"Hobbies: {', '.join(hobbies) if hobbies else 'None'}")
-    st.write(f"Streamlit Love Score: {rating}/10")
+df = pd.DataFrame(df)
+x = df['fraud']==1
+
+fraud = df[x]
+
+st.write("### Data Table")
+st.dataframe(fraud)  # interactive scrollable table
+
