@@ -8,37 +8,40 @@
 import streamlit as st 
 import pandas as pd
 
-st.title('UPLOAD CV HERE')
+st.title('UPLOAD CSV HERE')
 uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
-
-
-
 
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
-    filter = st.multiselect("Choose datatype", ['Numeric','Categorical','All','Boolean'], default = 'All')
 
-    if filter == "Numeric":
-        cols = df.select_dtypes(include=['int','float']).columns.to_list()
+    # Single-choice filter
+    filter_option = st.selectbox("Choose datatype", ['All','Numeric','Categorical','Boolean'])
 
-    elif filter == 'Categorical':
-        cols = df.select_dtypes(include=['object','category']).columns.to_list()
-
-    elif filter == 'Boolean':
-        cols = df.select_dtypes(include=['boolean']).columns.to_list()
-
+    # Filter columns by data type
+    if filter_option == "Numeric":
+        cols = df.select_dtypes(include=['int', 'float']).columns.to_list()
+    elif filter_option == 'Categorical':
+        cols = df.select_dtypes(include=['object', 'category']).columns.to_list()
+    elif filter_option == 'Boolean':
+        cols = df.select_dtypes(include=['bool']).columns.to_list()
     else:
         cols = df.columns.to_list()
 
-  
-    if cols is not None:
-        st.write("First 10 rows")
-        st.dataframe(df[cols].head(10))
-        st.write("Last 10 Rows")
-        st.dataframe(df[cols].tail(10))
-        st.write("Statistical Description")
-        st.dataframe(df[cols].describe(include='all'))
+    # Choose columns (multiselect)
+    selected_columns = st.multiselect(
+        "Choose columns",
+        cols,
+        default=cols,
+        key=f"cols_{filter_option}"  # forces refresh when filter changes
+    )
 
-
-    
-
+    # Display selected data
+    if selected_columns:
+        st.write("### First 10 rows")
+        st.dataframe(df[selected_columns].head(10))
+        
+        st.write("### Last 10 rows")
+        st.dataframe(df[selected_columns].tail(10))
+        
+        st.write("### Statistical Description")
+        st.dataframe(df[selected_columns].describe(include='all'))
