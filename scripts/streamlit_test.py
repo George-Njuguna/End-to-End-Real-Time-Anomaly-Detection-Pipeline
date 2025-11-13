@@ -16,7 +16,7 @@ uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
-    filter = st.multiselect("Choose datatype", ['Numeric','Categorical','All','Boolean'])
+    filter = st.multiselect("Choose datatype", ['Numeric','Categorical','All','Boolean'], default = 'All')
 
     if filter == "Numeric":
         cols = df.select_dtypes(include=['int','float']).columns.to_list()
@@ -30,9 +30,8 @@ if uploaded_file is not None:
     else:
         cols = df.columns.to_list()
 
-    columns_filter = st.multiselect("Filter by column name", cols ,default = cols  )
-
-    if columns_filter is not None:
+  
+    if cols is not None:
         st.write("First 10 rows")
         st.dataframe(df[cols].head(10))
         st.write("Last 10 Rows")
