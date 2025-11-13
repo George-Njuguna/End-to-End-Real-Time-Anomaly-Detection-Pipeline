@@ -30,7 +30,7 @@ if uploaded_file is not None:
     else:
         cols = df.columns.to_list()
 
-    columns_filter = st.multiselect("Filter by column name",cols)
+    columns_filter = st.multiselect("Filter by column name", default = cols  )
 
     if columns_filter is not None:
         st.write("First 10 rows")
