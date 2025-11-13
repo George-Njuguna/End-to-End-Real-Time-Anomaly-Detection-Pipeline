@@ -30,6 +30,15 @@ if uploaded_file is not None:
     else:
         cols = df.columns.to_list()
 
+    columns_filter = st.multiselect("Filter by column name",cols)
+
+    if columns_filter is not None:
+        st.write("First 10 rows")
+        st.dataframe(df[cols].head(10))
+        st.write("Last 10 Rows")
+        st.dataframe(df[cols].tail(10))
+        st.write("Statistical Description")
+        st.dataframe(df[cols].describe(include='all'))
 
 
     
