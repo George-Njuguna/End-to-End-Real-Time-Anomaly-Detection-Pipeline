@@ -55,14 +55,16 @@ if uploaded_file is not None:
      # Looping through all the columns 
     for col in selected_columns:
         if col != filter_by and filter_option == 'Numeric':
-            sns.lineplot(data= df, x=col, y=filter_by, ax=ax)
+            fig, ax = plt.subplots(figsize=(8, 5))
+            sns.lineplot(data= df, x=col, y=filter_by)
             ax.set_title(f"Line Plots with {filter_by} on Y-Axis")
             ax.legend(title='X-Axis Variable')
             plt.xticks(rotation=45, ha='right') 
             plt.tight_layout() 
             st.pyplot(fig)
             
-        elif col != filter_by and (filter_option == 'categorical' or filter_option == 'Boolean'):
+        elif col != filter_by and (filter_option == 'Categorical' or filter_option == 'Boolean'):
+
             # Getting the contingency table 
             crosstab4 = pd.crosstab( df[col] , df[filter_by] ) 
             crosstab_4 = pd.crosstab( df[col] , df[filter_by] , normalize = 'index' ) * 100
@@ -87,6 +89,7 @@ if uploaded_file is not None:
                 
                 ax[1].annotate(f'{height:.1f}%', 
                             (p.get_x() + p.get_width() / 2., height),  
-                            ha='center', va='bottom')              
+                            ha='center', va='bottom')         
+                     
             plt.tight_layout() 
             st.pyplot(fig)
