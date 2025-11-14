@@ -1,4 +1,4 @@
-'''Build an app that:
+''' Build an app that:
 1.	Lets user upload a CSV.
 2.	Displays the head() of the DataFrame.
 3.	Has a selectbox for choosing one column.
@@ -7,6 +7,8 @@
 
 import streamlit as st 
 import pandas as pd
+import seaborn as sns 
+import matplotlib.pyplot as plt
 
 st.title('UPLOAD CSV HERE')
 uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
@@ -16,6 +18,7 @@ if uploaded_file is not None:
 
     # Single-choice filter
     filter_option = st.selectbox("Choose datatype", ['All','Numeric','Categorical','Boolean'])
+    
 
     # Filter columns by data type
     if filter_option == "Numeric":
@@ -26,6 +29,7 @@ if uploaded_file is not None:
         cols = df.select_dtypes(include=['bool']).columns.to_list()
     else:
         cols = df.columns.to_list()
+    
 
     # Choose columns (multiselect)
     selected_columns = st.multiselect(
@@ -34,6 +38,8 @@ if uploaded_file is not None:
         default=cols,
         key=f"cols_{filter_option}"  # forces refresh when filter changes
     )
+
+    filter_by = st.selectbox("filter by",selected_columns)
 
     # Display selected data
     if selected_columns:
@@ -45,3 +51,42 @@ if uploaded_file is not None:
         
         st.write("### Statistical Description")
         st.dataframe(df[selected_columns].describe(include='all'))
+    
+     # Looping through all the columns 
+    for col in selected_columns:
+        if col != filter_by and filter_option == 'Numeric':
+            sns.lineplot(data= df, x=col, y=filter_by, ax=ax)
+            ax.set_title(f"Line Plots with {filter_by} on Y-Axis")
+            ax.legend(title='X-Axis Variable')
+            plt.xticks(rotation=45, ha='right') 
+            plt.tight_layout() 
+            st.pyplot(fig)
+            
+        elif col != filter_by and (filter_option == 'categorical' or filter_option == 'Boolean'):
+            # Getting the contingency table 
+            crosstab4 = pd.crosstab( df[col] , df[filter_by] ) 
+            crosstab_4 = pd.crosstab( df[col] , df[filter_by] , normalize = 'index' ) * 100
+
+            # Plotting the bar plot with the crosstab result
+            fig , ax = plt.subplots( 1 , 2 ,figsize = ( 13, 6 ))
+
+            crosstab4.plot(kind='bar', stacked=False, ax = ax[0])
+            crosstab_4.plot(kind='bar', stacked=False, ax = ax[1])
+
+            ax[0].set_title( f'{filter_by} Count by {col}' , fontweight = 'bold')
+            ax[0].set_ylabel( 'Count' , fontweight = 'bold')
+            ax[0].set_xlabel(f'{col} Ownership' , fontweight = 'bold')
+
+            ax[1].set_title( f'{filter_by} Rate by {col}' , fontweight = 'bold')
+            ax[1].set_ylabel( f'{filter_by} Rate' , fontweight = 'bold')
+            ax[1].set_xlabel(f'{col}' , fontweight = 'bold')
+
+            # Annotating the bars 
+            for p in ax[1].patches:
+                height = p.get_height()
+                
+                ax[1].annotate(f'{height:.1f}%', 
+                            (p.get_x() + p.get_width() / 2., height),  
+                            ha='center', va='bottom')              
+            plt.tight_layout() 
+            st.pyplot(fig)
