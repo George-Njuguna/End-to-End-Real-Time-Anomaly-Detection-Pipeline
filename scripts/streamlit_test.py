@@ -10,6 +10,18 @@ import pandas as pd
 import seaborn as sns 
 import matplotlib.pyplot as plt
 
+# Get Streamlit theme colors
+plt.rcParams["figure.facecolor"] = "none"
+plt.rcParams["axes.facecolor"] = "none"
+
+# Make all text white (works perfectly with Streamlit dark or light themes)
+plt.rcParams["text.color"] = "white"
+plt.rcParams["axes.labelcolor"] = "white"
+plt.rcParams["xtick.color"] = "white"
+plt.rcParams["ytick.color"] = "white"
+plt.rcParams["legend.labelcolor"] = "white"
+plt.rcParams["axes.titlecolor"] = "white"
+
 st.title('UPLOAD CSV HERE')
 uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 
@@ -56,10 +68,9 @@ if uploaded_file is not None:
     for col in selected_columns:
         if col != filter_by and filter_option == 'Numeric':
             fig, ax = plt.subplots(figsize=(8, 5))
-            ax.set_facecolor("none")
+
             sns.lineplot(data= df, x=col, y=filter_by)
             ax.set_title(f"Line Plots with {filter_by} on Y-Axis")
-            fig.patch.set_alpha(0)
             ax.legend(title='X-Axis Variable')
             plt.xticks(rotation=45, ha='right') 
             plt.tight_layout() 
@@ -73,7 +84,6 @@ if uploaded_file is not None:
 
             # Plotting the bar plot with the crosstab result
             fig , ax = plt.subplots( 1 , 2 ,figsize = ( 13, 6 ))
-            fig.patch.set_alpha(0)
             for a in ax:
                 a.set_facecolor("none")
 
