@@ -56,8 +56,10 @@ if uploaded_file is not None:
     for col in selected_columns:
         if col != filter_by and filter_option == 'Numeric':
             fig, ax = plt.subplots(figsize=(8, 5))
+            ax.set_facecolor("none")
             sns.lineplot(data= df, x=col, y=filter_by)
             ax.set_title(f"Line Plots with {filter_by} on Y-Axis")
+            fig.patch.set_alpha(0)
             ax.legend(title='X-Axis Variable')
             plt.xticks(rotation=45, ha='right') 
             plt.tight_layout() 
@@ -71,6 +73,9 @@ if uploaded_file is not None:
 
             # Plotting the bar plot with the crosstab result
             fig , ax = plt.subplots( 1 , 2 ,figsize = ( 13, 6 ))
+            fig.patch.set_alpha(0)
+            for a in ax:
+                a.set_facecolor("none")
 
             crosstab4.plot(kind='bar', stacked=False, ax = ax[0])
             crosstab_4.plot(kind='bar', stacked=False, ax = ax[1])
