@@ -66,7 +66,6 @@ if uploaded_file is not None:
         if filter_option == "Numeric":
             fig, ax = plt.subplots(figsize=(8, 5))
 
-            # Lineplot
             sns.lineplot(data=df, x=col, y=filter_by, ax=ax)
 
             ax.set_title(f"{col} vs {filter_by}", fontsize=14, fontweight="bold")
@@ -95,7 +94,7 @@ if uploaded_file is not None:
             ax[1].set_ylabel("Rate (%)")
             ax[1].tick_params(axis="x", rotation=45)
 
-            # Annotate percentages
+            # Annotate 
             for p in ax[1].patches:
                 height = p.get_height()
                 ax[1].annotate(
