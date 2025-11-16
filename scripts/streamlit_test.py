@@ -23,11 +23,6 @@ plt.rcParams["axes.titlecolor"] = "white"
 4.	Displays summary statistics of that column (df[column].describe()).
 '''
 
-import streamlit as st 
-import pandas as pd
-import seaborn as sns 
-import matplotlib.pyplot as plt
-
 st.title('UPLOAD CSV HERE')
 uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 
