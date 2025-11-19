@@ -151,7 +151,7 @@ def align_df_to_table(conn, df, table_name):
     return df
 
  # creating table for saving last processed id 
-def var_table(conn, table_name):
+def create_var_table(conn, table_name):
     try:
         with conn.cursor() as cur:
             cur.execute(f"""
