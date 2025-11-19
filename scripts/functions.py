@@ -1,5 +1,6 @@
  # Libraries
 import pandas as pd
+import numpy as np
 from sklearn.model_selection import train_test_split
 from psycopg2.extras import execute_values
 
@@ -108,6 +109,7 @@ def split_func(df):
         return X, y
     except Exception as e:
         print(" ERROR : COULD NOT SPLIT TO VARIABLES : ", e)
+
 
  # aligning columns arrangements
 def align_df_to_table(conn, df, table_name):
