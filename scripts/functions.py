@@ -150,6 +150,23 @@ def align_df_to_table(conn, df, table_name):
     print("✅ DataFrame successfully aligned to table column order")
     return df
 
+ # creating table for saving last processed id 
+def var_table(conn, table_name):
+    try:
+        with conn.cursor() as cur:
+            cur.execute(f"""
+                CREATE TABLE IF NOT EXISTS {table_name} (
+                    key TEXT  PRIMARY KEY,
+                    value TEXT 
+                    );           
+            """)
+            conn.commit()
+            print(f"✅ Table '{table_name}' CREATED/EXISTS).")
+    
+    except Exception as e:
+        print(f"❌ ERROR Creating var_table {table_name} : ", e)
+        if conn:
+            conn.rollback()
 
  # Creating table in postgress
 def create_table( conn, table_name ):  
