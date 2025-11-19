@@ -151,7 +151,7 @@ def align_df_to_table(conn, df, table_name):
     return df
 
  # creating table for saving last processed id 
-def create_var_table(conn, table_name):
+def create_transaction_id_table(conn, table_name):
     try:
         with conn.cursor() as cur:
             cur.execute(f"""
@@ -169,7 +169,8 @@ def create_var_table(conn, table_name):
             conn.rollback()
 
  # updating last processed id 
-def update_last_trans(conn, table_name, last_id):
+def update_last_transaction_id(conn, table_name, last_id):
+    last_id = str(last_id)
     try:
         with conn.cursor() as cur:
             cur.execute(f"""
@@ -180,7 +181,20 @@ def update_last_trans(conn, table_name, last_id):
             conn.commit()
             print(f"UPDATED LAST TRANSACTION ID")
     except Exception as e:
-        print(" ERROR IN UPDATING LAST TRANSACTION ID}", e) 
+        print(" ERROR IN UPDATING LAST TRANSACTION ID}", e)
+
+
+def load_last_transaction_id(conn,table_name):
+    with conn.cursor() as cur:
+        cur.execute(f"""
+            SELECT value 
+            FROM {table_name} 
+            WHERE key = 'last_transaction_id';
+        """)
+        result = cur.fetchone()
+        return int(result[0]) if result else None
+ 
+
 
  # Creating table in postgress
 def create_table( conn, table_name ):  

@@ -9,9 +9,10 @@ from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearc
 from sklearn.metrics import  precision_score , recall_score , f1_score, classification_report, confusion_matrix
 from dotenv import load_dotenv
 import psycopg2
+from psycopg2.extras import execute_values
 import pandas as pd
 import os
-from functions import split_func, create_table, load_data
+from functions import split_func, create_table, load_data, create_transaction_id_table,update_last_transaction_id
 
 load_dotenv()
 
@@ -51,6 +52,46 @@ def load_to_postgress(df , table_name):
 
     except Exception as e:
         print("❌ ERROR IN LOADING PIPELINE:", e)
+        if conn:
+            conn.rollback()
+    finally:
+        if conn:
+            conn.close()
+            print("🔌 CONNECTION CLOSED")
+
+# LOADING LAST ID  
+def update_last_transaction_id_pipe( table_name , run, last_id = 0 ):
+
+    try:
+        # connecting to the database
+        conn = psycopg2.connect(
+            dbname=os.getenv('POSTGRES_DB'),
+            user=os.getenv('POSTGRES_USER'),
+            password=os.getenv('POSTGRES_PW'),
+            host = os.getenv('POSTGRES_HOST'),
+            port=os.getenv('POSTGRES_PORT')
+        )
+        print('✅ Connection made')
+
+        # Checking if the tables Exist/Creating The Tables
+        create_transaction_id_table(conn, table_name)
+        
+        if run == 'first':
+            with conn.cursor() as cur:
+                    sql = f"""
+                        INSERT INTO {table_name} (key,value)
+                        VALUES ('last_transaction_id', '0');
+                        """
+                    execute_values(cur, sql)
+
+                    conn.commit()
+                    print("UPDATED LAST TRANSACTION ID AS 0")
+
+        else:
+            update_last_transaction_id(conn, table_name , last_id)
+
+    except Exception as e:
+        print("❌ ERROR IN LOADING LAST ID PIPELINE:", e)
         if conn:
             conn.rollback()
     finally:

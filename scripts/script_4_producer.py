@@ -1,4 +1,5 @@
 from pipelines import fetch_batch_data
+from functions import load_last_transaction_id,update_last_transaction_id
 from kafka import KafkaProducer
 import psycopg2
 import os 
@@ -7,10 +8,10 @@ import time
 import random as rd
 
 table_name = 'streaming_data'
+last_id_table = 'var_table'
 table2 = "streaming_data_test"
 msg_count= 0
 batches= 0
-last_id = 0
 msg_list = [3000,4000,5000,6000,8000,7000]
 
  # Connecting to database 
@@ -21,6 +22,8 @@ conn = psycopg2.connect(
     host = os.getenv('POSTGRES_HOST'),
     port=os.getenv('POSTGRES_PORT')
 )
+
+last_id = load_last_transaction_id(conn, last_id_table)
 
 # Kafka Producer 
 producer = KafkaProducer(
@@ -38,7 +41,7 @@ print("Producer started...")
 while True:
     transactions = fetch_batch_data(table2, 1000, conn, last_id)
 
-    if not transactions or msg_count == rd.choice(msg_list):
+    if not transactions:
         print("✅ No more transactions left to stream. Stopping producer.")
         break
 
@@ -58,7 +61,7 @@ while True:
 
     print(f"Produced {msg_count} messages so far...")
 
-
+update_last_transaction_id(conn, last_id_table, last_id)
 producer.flush()
 producer.close()
 conn.close()
