@@ -168,6 +168,20 @@ def create_var_table(conn, table_name):
         if conn:
             conn.rollback()
 
+ # updating last processed id 
+def update_last_trans(conn, table_name, last_id):
+    try:
+        with conn.cursor() as cur:
+            cur.execute(f"""
+                        UPDATE {table_name}
+                        SET value as {last_id}
+                        WHERE key = 'last_transaction_id'
+                        """)  
+            conn.commit()
+            print(f"UPDATED LAST TRANSACTION ID")
+    except Exception as e:
+        print(" ERROR IN UPDATING LAST TRANSACTION ID}", e) 
+
  # Creating table in postgress
 def create_table( conn, table_name ):  
     """    
