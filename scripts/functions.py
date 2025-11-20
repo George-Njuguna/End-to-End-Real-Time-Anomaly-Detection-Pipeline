@@ -214,6 +214,21 @@ def create_batch_table(conn, table_name):
         if conn:
             conn.rollback()
 
+ # Loading  batch and date 
+def load_batch(conn,table_name):
+    with conn.cursor() as cur:
+        cur.execute(f"""
+            SELECT batch,date 
+            FROM {table_name} 
+            WHERE status = 0
+            ORDER BY date ASC;
+        """)
+        result  = cur.fetchone()
+        batch = result[0]
+        date = result[1]
+        return batch, date 
+
+
  # Updating status in batch table
 def update_batch_status(conn, table_name, batch, date):
     try:
