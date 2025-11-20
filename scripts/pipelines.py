@@ -80,9 +80,9 @@ def update_last_transaction_id_pipe( table_name , run, last_id = 0 ):
             with conn.cursor() as cur:
                     sql = f"""
                         INSERT INTO {table_name} (key,value)
-                        VALUES ('last_transaction_id', '0');
+                        VALUES (%s, %s);
                         """
-                    execute_values(cur, sql)
+                    cur.execute(sql, ('last_transaction_id', '0'))
 
                     conn.commit()
                     print("UPDATED LAST TRANSACTION ID AS 0")
