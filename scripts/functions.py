@@ -210,7 +210,7 @@ def create_batch_table(conn, table_name):
             print(f"✅ Table '{table_name}' CREATED/EXISTS).")
     
     except Exception as e:
-        print(f"❌ ERROR Creating Batch Table {table_name} : ", e)
+        print(f" ERROR IN CREATING BATCH TABLE {table_name} : ", e)
         if conn:
             conn.rollback()
 
