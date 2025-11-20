@@ -215,7 +215,7 @@ def create_batch_table(conn, table_name):
             conn.rollback()
 
  # Loading  batch and date 
-def load_batch(conn,table_name):
+def load_batch_data(conn,table_name):
     with conn.cursor() as cur:
         cur.execute(f"""
             SELECT batch,date 
