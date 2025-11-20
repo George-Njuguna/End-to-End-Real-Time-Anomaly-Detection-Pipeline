@@ -8,7 +8,8 @@ import time
 import random as rd
 
 table_name = 'streaming_data'
-last_id_table = 'var_table'
+last_id_table = 'transaction_id_table'
+batch_table = 'batch_table'
 table2 = "streaming_data_test"
 msg_count= 0
 batches= 0
