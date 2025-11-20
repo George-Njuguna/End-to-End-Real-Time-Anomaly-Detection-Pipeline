@@ -185,6 +185,7 @@ def update_last_transaction_id(conn, table_name, last_id):
         if conn:
             conn.rollback()
 
+ # loading last transaction id 
 def load_last_transaction_id(conn,table_name):
     with conn.cursor() as cur:
         cur.execute(f"""
@@ -202,7 +203,7 @@ def create_batch_table(conn, table_name):
             cur.execute(f"""
                 CREATE TABLE IF NOT EXISTS {table_name} (
                     batch INTEGER NOT NULL ,
-                    date DATE PRIMARY KEY,
+                    date TIMESTAMP PRIMARY KEY,
                     status BOOLEAN 
                     );           
             """)
