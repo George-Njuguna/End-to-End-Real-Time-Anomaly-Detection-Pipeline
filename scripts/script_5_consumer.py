@@ -101,7 +101,6 @@ while True:
     for tp, messages in msg_pack.items():
         for message in messages:
             event = message.value
-            event["processed_at"] = pendulum.now("Africa/Nairobi").format("YYYY-MM-DD HH:mm:ss")
             batch.append(event)
 
     # Flush batch 
