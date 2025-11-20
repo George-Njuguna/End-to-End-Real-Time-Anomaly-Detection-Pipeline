@@ -157,7 +157,7 @@ def create_transaction_id_table(conn, table_name):
             cur.execute(f"""
                 CREATE TABLE IF NOT EXISTS {table_name} (
                     key TEXT  PRIMARY KEY,
-                    value TEXT 
+                    value INTEGER 
                     );           
             """)
             conn.commit()
@@ -170,7 +170,6 @@ def create_transaction_id_table(conn, table_name):
 
  # updating last processed id 
 def update_last_transaction_id(conn, table_name, last_id):
-    last_id = str(last_id)
     try:
         with conn.cursor() as cur:
             cur.execute(f"""
@@ -194,7 +193,7 @@ def load_last_transaction_id(conn,table_name):
             WHERE key = 'last_transaction_id';
         """)
         result = cur.fetchone()
-        return int(result[0]) if result else None
+        return result[0] if result else None
  
  # creating table for saving batches 
 def create_batch_table(conn, table_name):
