@@ -230,20 +230,27 @@ def load_batch_data(conn,table_name):
 
 
  # Updating status in batch table
-def update_batch_status(conn, table_name, batch, date):
+def update_batch_status_postgres(conn, table_name, batch, date):
+
     try:
         with conn.cursor() as cur:
-            cur.execute(f"""
-                        UPDATE {table_name}
-                        SET status = 1
-                        WHERE date = {date} AND batch = {batch};
-                        """)  
+            sql_query = f"""
+                UPDATE {table_name}
+                SET status = 1
+                WHERE date = %s AND batch = %s;
+            """
+            values_to_insert = (date, batch)
+            
+            cur.execute(sql_query, values_to_insert)
+            
             conn.commit()
-            print(f"UPDATED BATCH STATUS OF {date}")
+            print(f" SUCCESSFULLY UPDATED BATCH STATUS OF {date}. Rows affected: {cur.rowcount}")
+
     except Exception as e:
-        print(f" ERROR IN UPDATING BATCH STATUS OF {date}", e)
+        print(f" ERROR IN UPDATING BATCH STATUS OF {date}: {e}")
         if conn:
             conn.rollback()
+
 
  # Creating table in postgress
 def create_table( conn, table_name ):  
