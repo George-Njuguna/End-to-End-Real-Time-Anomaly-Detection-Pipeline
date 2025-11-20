@@ -12,7 +12,7 @@ import psycopg2
 from psycopg2.extras import execute_values
 import pandas as pd
 import os
-from functions import split_func, create_table, load_data, create_transaction_id_table,update_last_transaction_id
+from functions import split_func, create_table, load_data, create_transaction_id_table,update_last_transaction_id,create_batch_table
 
 load_dotenv()
 
@@ -59,7 +59,7 @@ def load_to_postgress(df , table_name):
             conn.close()
             print("🔌 CONNECTION CLOSED")
 
-# LOADING LAST ID  
+# LOADING LAST ID TO POSTGRESS  
 def update_last_transaction_id_pipe( table_name , run, last_id = 0 ):
 
     try:
@@ -92,6 +92,49 @@ def update_last_transaction_id_pipe( table_name , run, last_id = 0 ):
 
     except Exception as e:
         print("❌ ERROR IN LOADING LAST ID PIPELINE:", e)
+        if conn:
+            conn.rollback()
+    finally:
+        if conn:
+            conn.close()
+            print("🔌 CONNECTION CLOSED")
+
+# LOADING BATCHES TO POSTGRESS 
+def load_batches_pipe(df , table_name):
+
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("Input 'train_df' must be a pandas DataFrame!")
+    
+
+    """
+    Creates Train and Test Tables in postgres if they dont exist
+    Loads  Data in the Created tables    
+
+    Parameters
+    ----------
+    df : pd.DataFrame 
+    table_name : name of the table being loaded
+    """
+
+    try:
+        # connecting to the database
+        conn = psycopg2.connect(
+            dbname=os.getenv('POSTGRES_DB'),
+            user=os.getenv('POSTGRES_USER'),
+            password=os.getenv('POSTGRES_PW'),
+            host = os.getenv('POSTGRES_HOST'),
+            port=os.getenv('POSTGRES_PORT')
+        )
+        print('✅ Connection made')
+
+        # Checking if the tables Exist/Creating The Tables
+        create_batch_table(conn, table_name)
+        
+        # Loading The Data
+        load_data(conn, df, table_name)
+
+    except Exception as e:
+        print("❌ ERROR IN LOADING BATCH DATA:", e)
         if conn:
             conn.rollback()
     finally:
