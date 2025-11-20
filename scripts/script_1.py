@@ -8,7 +8,7 @@ import pandas as pd
 load_dotenv()
 
 table_name1 = 'Transactions'
-last_id_table = 'var_table'
+last_id_table = 'transaction_id_table'
 batch_table = 'batch_table'
 table_name2 = "streaming_data"
 csv_path = os.getenv("csv_path")
