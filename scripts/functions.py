@@ -237,7 +237,7 @@ def update_batch_status(conn, table_name, batch, date):
                         UPDATE {table_name}
                         SET status = 1
                         WHERE date = {date}
-                        AND batch = {batch}
+                        AND batch = {batch};
                         """)  
             conn.commit()
             print(f"UPDATED BATCH STATUS OF {date}")
