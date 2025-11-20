@@ -230,7 +230,7 @@ def load_batch_data(conn,table_name):
 
 
  # Updating status in batch table
-def update_batch_status_postgres(conn, table_name, batch, date):
+def update_batch_status(conn, table_name, batch, date):
 
     try:
         with conn.cursor() as cur:
