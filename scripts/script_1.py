@@ -19,10 +19,8 @@ end_date = '2025-12-31'
 
 data3 = pd.DataFrame(pd.date_range(start=start_date, end=end_date, freq='D'),columns = ['date'] ) 
 # batches
-batches = pd.Series([1874, 1185, 2090, 1187, 2460, 2906, 1460, 1729, 2222, 1928, 1597, 2404, 1503, 1083, 1177, 1796, 2905, 2980, 2309, 1374, 1079, 1989, 1442, 2816, 1690, 1893, 1957, 1009, 1080, 1699, 2139])
-status = pd.Series([0 for _ in range(31)])
-data3['batch'] = batches
-data3['status'] = status
+data3['batch'] = pd.Series([1874, 1185, 2090, 1187, 2460, 2906, 1460, 1729, 2222, 1928, 1597, 2404, 1503, 1083, 1177, 1796, 2905, 2980, 2309, 1374, 1079, 1989, 1442, 2816, 1690, 1893, 1957, 1009, 1080, 1699, 2139])
+data3['status']= pd.Series([0 for _ in range(31)])
 
  # loading the data from csv
 data = load_csv(csv_path)
