@@ -174,7 +174,7 @@ def update_last_transaction_id(conn, table_name, last_id):
         with conn.cursor() as cur:
             cur.execute(f"""
                         UPDATE {table_name}
-                        SET value as {last_id}
+                        SET value = {last_id}
                         WHERE key = 'last_transaction_id'
                         """)  
             conn.commit()
@@ -235,7 +235,7 @@ def update_batch_status(conn, table_name, batch, date):
         with conn.cursor() as cur:
             cur.execute(f"""
                         UPDATE {table_name}
-                        SET status as 1
+                        SET status = 1
                         WHERE date = {date}
                         AND batch = {batch}
                         """)  
