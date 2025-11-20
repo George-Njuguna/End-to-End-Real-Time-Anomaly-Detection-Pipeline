@@ -194,7 +194,24 @@ def load_last_transaction_id(conn,table_name):
         result = cur.fetchone()
         return int(result[0]) if result else None
  
-
+ # creating table for saving batches 
+def create_batch_table(conn, table_name):
+    try:
+        with conn.cursor() as cur:
+            cur.execute(f"""
+                CREATE TABLE IF NOT EXISTS {table_name} (
+                    batch INTEGER NOT NULL ,
+                    date DATE PRIMARY KEY,
+                    status BOOLEAN 
+                    );           
+            """)
+            conn.commit()
+            print(f"✅ Table '{table_name}' CREATED/EXISTS).")
+    
+    except Exception as e:
+        print(f"❌ ERROR Creating Batch Table {table_name} : ", e)
+        if conn:
+            conn.rollback()
 
  # Creating table in postgress
 def create_table( conn, table_name ):  
