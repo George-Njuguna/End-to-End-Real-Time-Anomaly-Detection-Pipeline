@@ -204,7 +204,7 @@ def create_batch_table(conn, table_name):
                 CREATE TABLE IF NOT EXISTS {table_name} (
                     batch INTEGER NOT NULL ,
                     date TIMESTAMP PRIMARY KEY,
-                    status BOOLEAN 
+                    status INTEGER 
                     );           
             """)
             conn.commit()
