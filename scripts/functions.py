@@ -182,7 +182,8 @@ def update_last_transaction_id(conn, table_name, last_id):
             print(f"UPDATED LAST TRANSACTION ID")
     except Exception as e:
         print(" ERROR IN UPDATING LAST TRANSACTION ID}", e)
-
+        if conn:
+            conn.rollback()
 
 def load_last_transaction_id(conn,table_name):
     with conn.cursor() as cur:
@@ -210,6 +211,23 @@ def create_batch_table(conn, table_name):
     
     except Exception as e:
         print(f"❌ ERROR Creating Batch Table {table_name} : ", e)
+        if conn:
+            conn.rollback()
+
+ # Updating status in batch table
+def update_batch_status(conn, table_name, batch, date):
+    try:
+        with conn.cursor() as cur:
+            cur.execute(f"""
+                        UPDATE {table_name}
+                        SET status as 1
+                        WHERE date = {date}
+                        AND batch = {batch}
+                        """)  
+            conn.commit()
+            print(f"UPDATED BATCH STATUS OF {date}")
+    except Exception as e:
+        print(f" ERROR IN UPDATING BATCH STATUS OF {date}", e)
         if conn:
             conn.rollback()
 
