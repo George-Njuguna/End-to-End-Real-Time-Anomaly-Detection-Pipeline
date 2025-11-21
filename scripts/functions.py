@@ -1,6 +1,6 @@
  # Libraries
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 import random
 from sklearn.model_selection import train_test_split
 from psycopg2.extras import execute_values
@@ -431,15 +431,30 @@ def import_data(table_name, conn):
 
 
  # getting a random time of a day
-def get_random_time_of_day(base_time):
+def get_random_time_of_day(base_time, start_hour=8, end_hour=17):
     """
-    Generates a random time of day without
+    Generates a random datetime object on the base_time's date,
+    with a time component between start_hour (inclusive) and end_hour (exclusive).
+    
+    parameters
+    ----------
+        base_time (datetime): The base date to apply the random time to.
+        start_hour (int): The starting hour (e.g., 8 for 8:00 AM).
+        end_hour (int): The ending hour (e.g., 17 for 5:00 PM, which is 17:00).
+
+    Returns
+    -------
+        datetime: A datetime object with a random time in the specified range.
     """
-    SECONDS_IN_DAY = 86400
-    random_seconds = random.randrange(SECONDS_IN_DAY)
     
-    time_delta = timedelta(seconds=random_seconds)
-    final_date = base_time + time_delta
+    start_time = base_time.replace(hour=start_hour, minute=0, second=0, microsecond=0)
+    end_time = base_time.replace(hour=end_hour, minute=0, second=0, microsecond=0)
     
-    return final_date
+    time_range_seconds = int((end_time - start_time).total_seconds())
+    
+    random_seconds_offset = random.randrange(time_range_seconds)
+    
+    final_datetime = start_time + timedelta(seconds=random_seconds_offset)
+    
+    return final_datetime
 
