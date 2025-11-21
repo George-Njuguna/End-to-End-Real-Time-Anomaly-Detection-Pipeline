@@ -7,7 +7,7 @@ import pandas as pd
 
 load_dotenv()
 
-table_name1 = 'Transactions'
+table_name1 = 'transactions'
 last_id_table = 'transaction_id_table'
 batch_table = 'batch_table'
 table_name2 = "streaming_data"
@@ -28,6 +28,9 @@ data = load_csv(csv_path)
  # performing feature Engineering
 feat_eng_data = feat_eng(data)
 data1, data2 = split_1(feat_eng_data)
+
+data1.columns = data1.columns.str.lower()
+data2.columns = data2.columns.str.lower()
 
  # creating tables and loading data to the tables 
 update_last_transaction_id_pipe(last_id_table, 'first')

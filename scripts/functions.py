@@ -146,7 +146,7 @@ def align_df_to_table(conn, df, table_name):
 
     # Reindex DF to correct order (dropping extra columns)
     df = df[db_columns]
-    print("ordered database colums", df.columns.to_list)
+    print("ordered database colums", df.columns.to_list())
 
     print("✅ DataFrame successfully aligned to table column order")
     return df
