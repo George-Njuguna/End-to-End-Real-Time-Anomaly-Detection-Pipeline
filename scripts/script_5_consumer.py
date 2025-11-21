@@ -10,7 +10,7 @@ import os
 
 tracking_uri = "http://mlflow:5001"
 model_name = "fraud_detection_test"
-table_name_1 = "Transactions"
+table_name_1 = "transactions"
 table_name = "infered_transactions"
 model_name = "fraud_detection_test"
 

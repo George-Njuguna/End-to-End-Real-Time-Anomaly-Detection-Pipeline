@@ -4,14 +4,22 @@ from kafka import KafkaProducer
 import psycopg2
 import os 
 import json
-import time 
-import random as rd
+from datetime import datetime, date
 
 table_name = 'streaming_data'
 last_id_table = 'transaction_id_table'
 batch_table = 'batch_table'
 table2 = "streaming_data_test"
 msg_count= 0
+batches = 0
+
+def json_serializer(obj):
+    """Custom serializer for objects not serializable by default json code"""
+    if isinstance(obj, (datetime, date)):
+        # Convert datetime/date objects to an ISO 8601 string representation
+        return obj.isoformat()
+    # default encoder handle other types
+    raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
 
  # Connecting to database 
 conn = psycopg2.connect(
@@ -28,7 +36,7 @@ batch, date = load_batch_data(conn, batch_table)
 # Kafka Producer 
 producer = KafkaProducer(
     bootstrap_servers=['kafka-1:9092','kafka-2:9092','kafka-3:9092'],
-    value_serializer=lambda v: json.dumps(v).encode('utf-8'),
+    value_serializer=lambda v: json.dumps(v, default=json_serializer).encode('utf-8'),
     acks='all',  
     enable_idempotence=True,       
     linger_ms=5,          
