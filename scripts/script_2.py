@@ -7,7 +7,7 @@ from log_mlflow import mlflow_pipe, get_best_run_from_domain, get_prod_model, up
 
 load_dotenv()
 
-table_name = 'Transactions'
+table_name = 'transactions'
 tracking_uri = "http://mlflow:5001"
 experiment_name = "Fraud_Detection_test"
 model_name = "fraud_detection_test"
