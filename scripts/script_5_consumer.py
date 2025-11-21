@@ -10,6 +10,7 @@ import os
 
 tracking_uri = "http://mlflow:5001"
 model_name = "fraud_detection_test"
+table_name_1 = "Transactions"
 table_name = "infered_transactions"
 model_name = "fraud_detection_test"
 
@@ -46,7 +47,7 @@ consumer = KafkaConsumer(
 )
 
 batch = []
-batch_size = 1000
+batch_size = 300
 
 no_msg_count = 0
 max_idle_polls = 30
@@ -75,6 +76,9 @@ while True:
                 #dropping the processed at 
                 df = df.drop("processed_at", axis=1)
 
+                 # loading data in transaction for later modelling
+                load_data(conn, df, table_name_1)
+
                 test_data, y = split_func(df)
                 predictions = model.predict(test_data)
                 probabilities = model.predict_proba(test_data)[:, 1] * 100
@@ -85,6 +89,7 @@ while True:
                 test_data['prediction'] = predictions
                 test_data['probability'] = probabilities
                 
+                 # loading for inference
                 load_data(conn, test_data, table_name)
                 consumer.commit()
                 batch.clear()
@@ -114,6 +119,9 @@ while True:
          # dropping processed data
         df = df.drop("processed_at", axis=1)
 
+         # loading data in transaction for later modelling
+        load_data(conn, df, table_name_1)
+
         test_data, y = split_func(df)
         predictions = model.predict(test_data)
         probabilities = model.predict_proba(test_data)[:, 1] * 100
@@ -124,6 +132,7 @@ while True:
         test_data['prediction'] = predictions
         test_data['probability'] = probabilities
 
+         # loading for inference
         load_data(conn, test_data, table_name)
         consumer.commit()
 
