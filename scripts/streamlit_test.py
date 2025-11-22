@@ -1,9 +1,26 @@
+''' Build an app that:
+1.  Lets user upload a CSV.
+2.  Displays the head() of the DataFrame.
+3.  Has a selectbox for choosing one column.
+4.  Displays summary statistics of that column (df[column].describe()).
+'''
+
 import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import plotly.express as px
 
-
+st.set_page_config(page_title="My Dashboard", layout="wide")
+st.markdown("""
+    <style>
+        .block-container {
+            padding-top: 1rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 plt.rcParams["figure.facecolor"] = "none"
 plt.rcParams["axes.facecolor"] = "none"
@@ -15,94 +32,32 @@ plt.rcParams["ytick.color"] = "white"
 plt.rcParams["legend.labelcolor"] = "white"
 plt.rcParams["axes.titlecolor"] = "white"
 
+ # Setting sidebar 
+st.sidebar.title("Filters and Settings")
 
-''' Build an app that:
-1.	Lets user upload a CSV.
-2.	Displays the head() of the DataFrame.
-3.	Has a selectbox for choosing one column.
-4.	Displays summary statistics of that column (df[column].describe()).
-'''
+uploaded_file = st.sidebar.file_uploader("Upload CSV (optional)", type=["csv"])
+if uploaded_file:
+    df1 = pd.read_csv(uploaded_file)
 
-st.title('UPLOAD CSV HERE')
-uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+st.sidebar.markdown("---")
+filter_trans = st.sidebar.selectbox("Transction Type",["all","fraud","valid"])
+start_date = st.sidebar.date_input("From", value = None)
+end_date = st.sidebar.date_input("To", value = None)
+st.sidebar.markdown("---")
+limit_rows = st.sidebar.slider("Max rows shown in table", min_value=50, max_value=1000, value=100, step=50)
 
-if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file)
 
-    # Single-choice filter
-    filter_option = st.selectbox("Choose datatype", ['All','Numeric','Categorical','Boolean'])
-    
+ # Setting the header and KPI
+st.title("Near Time Transaction Monitoring Dashboard")
 
-    # Filter columns by data type
-    if filter_option == "Numeric":
-        cols = df.select_dtypes(include=['int', 'float']).columns.to_list()
-    elif filter_option == 'Categorical':
-        cols = df.select_dtypes(include=['object', 'category']).columns.to_list()
-    elif filter_option == 'Boolean':
-        cols = df.select_dtypes(include=['bool']).columns.to_list()
-    else:
-        cols = df.columns.to_list()
-    
+ # setting tabs
+T1,T2 = st.tabs(["Overview", "Details"])
 
-    # Choose columns (multiselect)
-    selected_columns = st.multiselect(
-        "Choose columns",
-        cols,
-        default=cols,
-        key=f"cols_{filter_option}"  # forces refresh when filter changes
-    )
-
-    filter_by = st.selectbox("filter by",selected_columns)
-
-    # Display selected data
-    if selected_columns:
-        st.write("### First 10 rows")
-        st.dataframe(df[selected_columns].head(10))
-        
-        st.write("### Last 10 rows")
-        st.dataframe(df[selected_columns].tail(10))
-        
-        st.write("### Statistical Description")
-        st.dataframe(df[selected_columns].describe(include='all'))
-    
-     # Looping through all the columns 
-    for col in selected_columns:
-        if col != filter_by and filter_option == 'Numeric':
-            fig, ax = plt.subplots(figsize=(8, 5))
-            sns.lineplot(data= df, x=col, y=filter_by)
-            ax.set_title(f"Line Plots with {filter_by} on Y-Axis")
-            ax.legend(title='X-Axis Variable')
-            plt.xticks(rotation=45, ha='right') 
-            plt.tight_layout() 
-            st.pyplot(fig)
-            
-        elif col != filter_by and (filter_option == 'Categorical' or filter_option == 'Boolean'):
-
-            # Getting the contingency table 
-            crosstab4 = pd.crosstab( df[col] , df[filter_by] ) 
-            crosstab_4 = pd.crosstab( df[col] , df[filter_by] , normalize = 'index' ) * 100
-
-            # Plotting the bar plot with the crosstab result
-            fig , ax = plt.subplots( 1 , 2 ,figsize = ( 13, 6 ))
-
-            crosstab4.plot(kind='bar', stacked=False, ax = ax[0])
-            crosstab_4.plot(kind='bar', stacked=False, ax = ax[1])
-
-            ax[0].set_title( f'{filter_by} Count by {col}' , fontweight = 'bold')
-            ax[0].set_ylabel( 'Count' , fontweight = 'bold')
-            ax[0].set_xlabel(f'{col} Ownership' , fontweight = 'bold')
-
-            ax[1].set_title( f'{filter_by} Rate by {col}' , fontweight = 'bold')
-            ax[1].set_ylabel( f'{filter_by} Rate' , fontweight = 'bold')
-            ax[1].set_xlabel(f'{col}' , fontweight = 'bold')
-
-            # Annotating the bars 
-            for p in ax[1].patches:
-                height = p.get_height()
-                
-                ax[1].annotate(f'{height:.1f}%', 
-                            (p.get_x() + p.get_width() / 2., height),  
-                            ha='center', va='bottom')         
-                     
-            plt.tight_layout() 
-            st.pyplot(fig)  
+with T1:
+    k1, k2, k3, k4, k5 = st.columns([2,2,2,2,2])
+    k1.metric('All Transactions', f"{df1['Age'].nunique()}","10%", chart_data = df1['Age'],chart_type = 'line', border=True)
+    k2.metric('Valid Transactions', f"{df1['Age'].nunique()}" ,"10%", chart_data = df1['Age'],chart_type = 'line', border=True)
+    k3.metric('Fradulent Transactions', f"{df1['Age'].nunique()}","10%", chart_data = df1['Age'],chart_type = 'line', border=True)
+    k4.metric('False Alarm', f"{df1['Age'].nunique()}" ,"10%", chart_data = df1['Age'],chart_type = 'line', border=True)
+    k5.metric('Missed Fraud', f"{df1['Age'].nunique()}","10%", chart_data = df1['Age'],chart_type = 'line', border=True )
+    st.markdown("---")
