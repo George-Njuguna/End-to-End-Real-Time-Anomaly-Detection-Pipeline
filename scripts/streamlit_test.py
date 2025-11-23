@@ -50,7 +50,7 @@ conn = psycopg2.connect(
     port="5431"
 )
 
-df1 = import_data( table, conn )
+df = import_data( table, conn )
 
  # Setting sidebar 
 st.sidebar.title("Filters and Settings")
@@ -65,8 +65,8 @@ limit_rows = st.sidebar.slider("Max rows shown in table", min_value=50, max_valu
 
  # data
 with start_date:
-    if start_date == None:
-        All = 0 , valid = 0, fraud = 0, false_alarm = 0, missed = 0
+    all = df['processed_at'].between(start_date, end_date)
+
 
 
 
@@ -78,9 +78,9 @@ T1,T2 = st.tabs(["Overview", "Details"])
 
 with T1:
     k1, k2, k3, k4, k5 = st.columns([2,2,2,2,2])
-    k1.metric('All Transactions', f"{df1['Age'].nunique()}","10%", chart_data = df1['Age'],chart_type = 'line', border=True)
-    k2.metric('Valid Transactions', f"{df1['Age'].nunique()}" ,"10%", chart_data = df1['Age'],chart_type = 'line', border=True)
-    k3.metric('Fradulent Transactions', f"{df1['Age'].nunique()}","10%", chart_data = df1['Age'],chart_type = 'line', border=True)
-    k4.metric('False Alarm', f"{df1['Age'].nunique()}" ,"10%", chart_data = df1['Age'],chart_type = 'line', border=True)
-    k5.metric('Missed Fraud', f"{df1['Age'].nunique()}","10%", chart_data = df1['Age'],chart_type = 'line', border=True )
+    k1.metric('All Transactions', f"{df['Age'].nunique()}","10%", chart_data = df['Age'],chart_type = 'line', border=True)
+    k2.metric('Valid Transactions', f"{df['Age'].nunique()}" ,"10%", chart_data = df['Age'],chart_type = 'line', border=True)
+    k3.metric('Fradulent Transactions', f"{df['Age'].nunique()}","10%", chart_data = df['Age'],chart_type = 'line', border=True)
+    k4.metric('False Alarm', f"{df['Age'].nunique()}" ,"10%", chart_data = df['Age'],chart_type = 'line', border=True)
+    k5.metric('Missed Fraud', f"{df['Age'].nunique()}","10%", chart_data = df['Age'],chart_type = 'line', border=True )
     st.markdown("---")
