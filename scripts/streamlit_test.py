@@ -63,9 +63,13 @@ end_date = st.sidebar.date_input("To", value = datetime.date( 2025, 12, 31 ))
 st.sidebar.markdown("---")
 limit_rows = st.sidebar.slider("Max rows shown in table", min_value=50, max_value=1000, value=100, step=50)
 
- # data
-with start_date:
-    all = df['processed_at'].between(start_date, end_date)
+
+# Numerical KPI
+all = df['processed_at'].between(start_date, end_date)
+
+# Percentage from previous day 
+previous_day = df['processed_at']< start_date 
+percentage_increase = ((previous_day - all)/all)*100
 
 
 
