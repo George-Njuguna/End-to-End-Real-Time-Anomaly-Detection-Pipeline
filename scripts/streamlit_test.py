@@ -41,7 +41,13 @@ plt.rcParams["ytick.color"] = "white"
 plt.rcParams["legend.labelcolor"] = "white"
 plt.rcParams["axes.titlecolor"] = "white"
 
+
  # loading from postgress(test)
+@st.cache_data(ttl=60)
+
+def load_cached_data(table, conn_params):
+    return import_data(table, conn_params)
+
 conn = psycopg2.connect(
     dbname=os.getenv('POSTGRES_DB'),
     user=os.getenv('POSTGRES_USER'),
@@ -50,7 +56,7 @@ conn = psycopg2.connect(
     port="5431"
 )
 
-df = import_data( table, conn )
+df = load_cached_data( table, conn )
 
  # Setting sidebar 
 st.sidebar.title("Filters and Settings")
