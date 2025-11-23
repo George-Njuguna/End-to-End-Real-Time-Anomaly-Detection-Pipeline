@@ -10,6 +10,15 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import plotly.express as px
+import psycopg2
+import os
+from dotenv import load_dotenv
+from functions import import_data
+from datetime import datetime, timedelta
+
+ # table
+table = "infered_statistics"
+
 
 st.set_page_config(page_title="My Dashboard", layout="wide")
 st.markdown("""
@@ -32,19 +41,33 @@ plt.rcParams["ytick.color"] = "white"
 plt.rcParams["legend.labelcolor"] = "white"
 plt.rcParams["axes.titlecolor"] = "white"
 
+ # loading from postgress(test)
+conn = psycopg2.connect(
+    dbname=os.getenv('POSTGRES_DB'),
+    user=os.getenv('POSTGRES_USER'),
+    password="aninterludecalled",
+    host = "localhost",
+    port="5431"
+)
+
+df1 = import_data( table, conn )
+
  # Setting sidebar 
 st.sidebar.title("Filters and Settings")
 
-uploaded_file = st.sidebar.file_uploader("Upload CSV (optional)", type=["csv"])
-if uploaded_file:
-    df1 = pd.read_csv(uploaded_file)
 
 st.sidebar.markdown("---")
 filter_trans = st.sidebar.selectbox("Transction Type",["all","fraud","valid"])
-start_date = st.sidebar.date_input("From", value = None)
-end_date = st.sidebar.date_input("To", value = None)
+start_date = st.sidebar.date_input("From", value = datetime.date( 2025, 12, 1 ) )
+end_date = st.sidebar.date_input("To", value = datetime.date( 2025, 12, 31 ))
 st.sidebar.markdown("---")
 limit_rows = st.sidebar.slider("Max rows shown in table", min_value=50, max_value=1000, value=100, step=50)
+
+ # data
+with start_date:
+    if start_date == None:
+        All = 0 , valid = 0, fraud = 0, false_alarm = 0, missed = 0
+
 
 
  # Setting the header and KPI
