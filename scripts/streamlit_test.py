@@ -96,7 +96,7 @@ st.sidebar.title("Filters and Settings")
 
 
 st.sidebar.markdown("---")
-filter_trans = st.sidebar.selectbox("Transction Type",["all","fraud","valid"])
+filter_trans = st.sidebar.selectbox("Transction Type",["All","Fraud","Valid"])
 start_dt = st.sidebar.date_input("From", value = datetime.date( 2025, 12, 1 ) )
 end_dt = st.sidebar.date_input("To", value = None)
 st.sidebar.markdown("---")
@@ -187,22 +187,56 @@ with T1:
     st.header("Overview")
 
     with st.container():
+
+        fraud_sum = df.loc[fraud_filter, 'ammount'].sum()
+        valid_sum = df.loc[valid_filter, 'ammount'].sum()
+        false_alarm_sum = df.loc[false_alarm_filter, 'ammount'].sum()
+        missed_alarm_sum = df.loc[missed_alarm_filter, 'ammount'].sum()
+
          # Two charts
         col1, col2 = st.columns([3,1])
+        if filter_trans == 'All':
+            df = df
+            values = [valid_sum, fraud_sum, false_alarm_sum, missed_alarm_sum]
+            labels = ["Valid", "Fraud", "False Alarms", "Missed Alarms"]
+
+        elif filter_trans == 'Fraud':
+            df = df[fraud_filter]
+            values = [fraud_sum, missed_alarm_sum]
+            labels = [ "Fraud", "Missed Alarms"]
+
+        else:
+            df = df[valid_filter]
+            values = [valid_sum, false_alarm_sum]
+            labels = ["Valid", "False Alarms"]
+
         df_hourly = (
             df.resample('H', on='processed_at')
             .sum(numeric_only=True)
             .reset_index()
             )
-        df_hourly['ammount'] = df_hourly['ammount'].rolling(3).mean()
-        daily_sum = (df.groupby('processed_at')['ammount'].sum().reset_index())
+        df_hourly['amount'] = df_hourly['ammount'].rolling(3).mean()
 
-        fig = px.line(
-            df_hourly,
-            x='processed_at',
-            y='amount',
-            title='Transactions Over Time',
+        with col1:
+            fig = px.line(
+                df_hourly,
+                x='processed_at',
+                y='amount',
+                line_shape='spline',
+                title=f"{filter_trans} Transactions Over Time",
+                )
+            
+            fig.update_traces(mode='lines+markers')
+            st.plotly_chart(fig, use_container_width=True,theme="streamlit")
+
+        with col2:
+            fig = px.pie(
+                names=labels,
+                values=values,
+                hole=0.75,   
             )
-        
-        fig.update_traces(mode='lines+markers')
-        st.plotly_chart(fig, use_container_width=True,theme="streamlit")
+
+            fig.update_traces(textinfo='percent') 
+            fig.update_layout(title=f"{filter_trans}Transaction Summary")
+
+            st.plotly_chart(fig, use_container_width=True, theme="streamlit")
