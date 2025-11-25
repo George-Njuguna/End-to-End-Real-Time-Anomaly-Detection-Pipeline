@@ -98,12 +98,19 @@ st.sidebar.title("Filters and Settings")
 st.sidebar.markdown("---")
 filter_trans = st.sidebar.selectbox("Transction Type",["all","fraud","valid"])
 start_dt = st.sidebar.date_input("From", value = datetime.date( 2025, 12, 1 ) )
-end_dt = st.sidebar.date_input("To", value = datetime.date( 2025, 12, 31 ))
+end_dt = st.sidebar.date_input("To", value = None)
 st.sidebar.markdown("---")
 limit_rows = st.sidebar.slider("Max rows shown in table", min_value=50, max_value=1000, value=100, step=50)
 
-start_date = pd.to_datetime(start_dt)
-end_date = pd.to_datetime(end_dt)
+if start_dt == None:
+    st.error("Start Date cannot be empty.")
+else:
+    start_date = pd.to_datetime(start_dt)
+
+if end_dt == None:
+    st.write('filtering for one day')
+else:
+    end_date = pd.to_datetime(end_dt)
 
 
 all_filter = df['processed_at'].between(start_date, end_date)
