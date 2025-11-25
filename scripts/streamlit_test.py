@@ -218,25 +218,27 @@ with T1:
         df_hourly['amount'] = df_hourly['ammount'].rolling(3).mean()
 
         with col1:
-            fig = px.line(
-                df_hourly,
-                x='processed_at',
-                y='amount',
-                line_shape='spline',
-                title=f"{filter_trans} Transactions Over Time",
-                )
-            
-            fig.update_traces(mode='lines+markers')
-            st.plotly_chart(fig, use_container_width=True,theme="streamlit")
+            with st.container(border=True):
+                fig = px.line(
+                    df_hourly,
+                    x='processed_at',
+                    y='amount',
+                    line_shape='spline',
+                    title=f"{filter_trans} Transactions Over Time",
+                    )
+                
+                fig.update_traces(mode='lines+markers')
+                st.plotly_chart(fig, use_container_width=True,theme="streamlit")
 
         with col2:
-            fig = px.pie(
-                names=labels,
-                values=values,
-                hole=0.75,   
-            )
+            with st.container(border=True):
+                fig = px.pie(
+                    names=labels,
+                    values=values,
+                    hole=0.75,   
+                )
 
-            fig.update_traces(textinfo='percent') 
-            fig.update_layout(title=f"{filter_trans}Transaction Summary")
+                fig.update_traces(textinfo='percent', rotation = 120) 
+                fig.update_layout(title=f"{filter_trans}Transaction Summary")
 
-            st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+                st.plotly_chart(fig, use_container_width=True, theme="streamlit")
