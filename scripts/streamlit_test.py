@@ -135,7 +135,7 @@ else:
         elif day_difference == 31 or day_difference == 30:
             mess = "From Past Month"
         else:
-            mess = f"From Past{day_difference} Days"
+            mess = f"From Past {day_difference} Days"
 
 
 
