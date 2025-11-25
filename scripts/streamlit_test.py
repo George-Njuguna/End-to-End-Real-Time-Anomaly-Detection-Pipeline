@@ -104,13 +104,13 @@ limit_rows = st.sidebar.slider("Max rows shown in table", min_value=50, max_valu
 
 if start_dt is None:
     st.error("Start Date cannot be empty.")
-elif start_dt is not None and end_dt is None: # if only one day is choosen previous day becomes the start date and the start date becomes the end date  
+elif start_dt is not None and end_dt is None: 
     start_date = pd.to_datetime(start_dt)
-    end_date = start_date
-     # changing start date to start date - 1 day 
-    start_date = start_date - pd.Timedelta(days=1)
+    end_date = start_date + pd.Timedelta(days=1)
 
-    previous_day_filter = (df['processed_at'] >= start_date) & (df['processed_at'] < end_date)
+    previous_date = start_date - pd.Timedelta(days=1)
+    previous_day_filter =  (df['processed_at'] < start_date) & (df['processed_at'] >= previous_date)
+    mess = "From Past day"
 else:
     start_date = pd.to_datetime(start_dt)
     end_date = pd.to_datetime(end_dt)
@@ -120,15 +120,27 @@ else:
     if day_difference == 1:
         previous_date = start_date - pd.Timedelta(days=1)
         previous_day_filter = (df['processed_at'] < start_date) & (df['processed_at'] >= previous_date)
+        mess = "From Past day"
     
     else:
         previous_date = start_date - pd.Timedelta(days=day_difference)
         previous_day_filter = (df['processed_at'] < start_date) & (df['processed_at'] >= previous_date)
 
+        if day_difference == 7 :
+            mess = "From Past Week"
+        elif day_difference == 14 :
+            mess = "From Past 2 Weeks"
+        elif day_difference == 21:
+            mess = "From Past 3 Weeks"
+        elif day_difference == 31 or day_difference == 30:
+            mess = "From Past Month"
+        else:
+            mess = f"From Past{day_difference} Days"
+
+
 
 
 all_filter = df['processed_at'].between(start_date, end_date)
-previous_day_filter = df['processed_at']< start_date
 valid_filter = ((df['fraud'] == 0) & (df['prediction'] == 0))
 fraud_filter = ((df['fraud'] == 1) & (df['prediction'] == 1))
 false_alarm_filter = ((df['fraud'] == 0) & (df['prediction'] == 1))
@@ -165,9 +177,9 @@ T1,T2 = st.tabs(["Overview", "Details"])
 
 with T1:
     k1, k2, k3, k4, k5 = st.columns([2,2,2,2,2])
-    k1.metric('All Transactions', f"{all_transactions}",f"{all_percentages}", border=True)
-    k2.metric('Valid Transactions', f"{valid_transactions}" ,f"{valid_percentages}", border=True)
-    k3.metric('Fradulent Transactions', f"{fraud_transactions}",f"{fraud_percentages}", border=True)
-    k4.metric('False Alarm', f"{false_alarm_transactions}" ,f"{false_alarm_percentages}", border=True)
-    k5.metric('Missed Fraud', f"{missed_alarm_transactions}",f"{missed_alarm_percentages}", border=True )
+    k1.metric('All Transactions', f"{all_transactions}",f"{all_percentages} {mess}", border=True)
+    k2.metric('Valid Transactions', f"{valid_transactions}" ,f"{valid_percentages} {mess}", border=True)
+    k3.metric('Fradulent Transactions', f"{fraud_transactions}",f"{fraud_percentages} {mess}", border=True)
+    k4.metric('False Alarm', f"{false_alarm_transactions}" ,f"{false_alarm_percentages} {mess}", border=True)
+    k5.metric('Missed Fraud', f"{missed_alarm_transactions}",f"{missed_alarm_percentages} {mess}", border=True )
     st.markdown("---")
