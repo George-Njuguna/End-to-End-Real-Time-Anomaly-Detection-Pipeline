@@ -102,15 +102,29 @@ end_dt = st.sidebar.date_input("To", value = None)
 st.sidebar.markdown("---")
 limit_rows = st.sidebar.slider("Max rows shown in table", min_value=50, max_value=1000, value=100, step=50)
 
-if start_dt == None:
+if start_dt is None:
     st.error("Start Date cannot be empty.")
+elif start_dt is not None and end_dt is None: # if only one day is choosen previous day becomes the start date and the start date becomes the end date  
+    start_date = pd.to_datetime(start_dt)
+    end_date = start_date
+     # changing start date to start date - 1 day 
+    start_date = start_date - pd.Timedelta(days=1)
+
+    previous_day_filter = (df['processed_at'] >= start_date) & (df['processed_at'] < end_date)
 else:
     start_date = pd.to_datetime(start_dt)
-
-if end_dt == None:
-    st.write('filtering for one day')
-else:
     end_date = pd.to_datetime(end_dt)
+
+    day_difference =(end_date - start_date).days
+
+    if day_difference == 1:
+        previous_date = start_date - pd.Timedelta(days=1)
+        previous_day_filter = (df['processed_at'] < start_date) & (df['processed_at'] >= previous_date)
+    
+    else:
+        previous_date = start_date - pd.Timedelta(days=day_difference)
+        previous_day_filter = (df['processed_at'] < start_date) & (df['processed_at'] >= previous_date)
+
 
 
 all_filter = df['processed_at'].between(start_date, end_date)
