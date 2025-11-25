@@ -183,3 +183,26 @@ with T1:
     k4.metric('False Alarm', f"{false_alarm_transactions}" ,f"{false_alarm_percentages} {mess}", border=True)
     k5.metric('Missed Fraud', f"{missed_alarm_transactions}",f"{missed_alarm_percentages} {mess}", border=True )
     st.markdown("---")
+
+    st.header("Overview")
+
+    with st.container():
+         # Two charts
+        col1, col2 = st.columns([3,1])
+        df_hourly = (
+            df.resample('H', on='processed_at')
+            .sum(numeric_only=True)
+            .reset_index()
+            )
+        df_hourly['ammount'] = df_hourly['ammount'].rolling(3).mean()
+        daily_sum = (df.groupby('processed_at')['ammount'].sum().reset_index())
+
+        fig = px.line(
+            df_hourly,
+            x='processed_at',
+            y='amount',
+            title='Transactions Over Time',
+            )
+        
+        fig.update_traces(mode='lines+markers')
+        st.plotly_chart(fig, use_container_width=True,theme="streamlit")
