@@ -208,8 +208,10 @@ with T1:
         all_hourly = df.resample("h", on="processed_at")["ammount"].sum().rolling(3).mean().rename("All")
         fraud_hourly = df[fraud_filter].resample("h", on="processed_at")["ammount"].sum().rolling(3).mean().rename("Fraud")
         valid_hourly = df[valid_filter].resample("h", on="processed_at")["ammount"].sum().rolling(3).mean().rename("Valid")
+        false_alarm_hourly = df[false_alarm_filter].resample("H", on="processed_at")["ammount"].sum().rolling(3).mean().rename("False Alarms")
+        missed_alarm_hourly = df[missed_alarm_filter].resample("H", on="processed_at")["ammount"].sum().rolling(3).mean().rename("Missed Alarms")
 
-        df_hourly = pd.concat([all_hourly, fraud_hourly, valid_hourly], axis=1).reset_index()
+        df_hourly = pd.concat([all_hourly, fraud_hourly, valid_hourly, false_alarm_hourly, missed_alarm_hourly], axis=1).reset_index()
 
 
         if filter_trans == "Show All":
@@ -266,12 +268,14 @@ with T1:
                 st.plotly_chart(fig, width='stretch', theme="streamlit")
 
         with col2:
+            pie_labels = ["Valid", "Fraud", "False Alarms", "Missed Alarms"]
+            pie_values = [valid_sum, fraud_sum, false_alarm_sum, missed_alarm_sum]
             with st.container(border=True):
                 fig = px.pie(
-                    names=labels,
-                    values=values,
+                    names=pie_labels,
+                    values=pie_values,
                     hole=0.75,
-                    color=labels,
+                    color=pie_labels,
                     color_discrete_map=COLOURS   
                 )
 
@@ -279,3 +283,30 @@ with T1:
                 fig.update_layout(title=f"{filter_trans} Transaction Summary")
 
                 st.plotly_chart(fig, width="stretch", theme="streamlit")
+
+     # bar graphs
+
+    with st.container(border=True):
+        # Melt for stacked bars
+        df_bar_melted = df_hourly.melt(
+            id_vars="processed_at",
+            value_vars=["Valid", "Fraud", "False Alarms", "Missed Alarms"],
+            var_name="category",
+            value_name="amount"
+        )
+
+        fig_bar = px.bar(
+            df_bar_melted,
+            x="processed_at",
+            y="amount",
+            color="category",
+            color_discrete_map=COLOURS,
+            title="Transaction Amounts Over Time"
+        )
+        fig_bar.update_layout(
+            barmode="stack",
+            xaxis_title="Time",
+            yaxis_title="Transaction Amount",
+            legend_title="Category"
+        )
+        st.plotly_chart(fig_bar, width="stretch", theme="streamlit")
