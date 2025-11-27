@@ -88,6 +88,31 @@ def get_transac_n_perc_increase(data, prev_day_filter, all_filter, curr_filter =
     
     return curr_day_counts, perc
 
+
+def get_tot_avg_ammount(data, prev_day_filter, all_filter):
+     # getting data counts that was before curr date 
+    prev_day_data = data[prev_day_filter]
+    previous_day_ammount = (prev_day_data["ammount"].sum())
+
+     # getting data counts on the current date range
+    curr_day_data = data[all_filter]   
+    curr_day_ammount = (curr_day_data["ammount"].sum())
+    
+     # getting avg 
+    avg = curr_day_ammount / (curr_day_data.shape)[0]
+
+     # getting the percentages increase
+    if previous_day_ammount == 0:
+        perc = np.nan
+        avg_perc = np.nan
+    else:
+        avg_prev = previous_day_ammount / (prev_day_data.shape)[0]
+        perc = ((curr_day_ammount-previous_day_ammount)/previous_day_ammount)*100
+
+        avg_perc = ((avg-avg_prev)/avg_prev)*100
+    
+    return curr_day_ammount, perc, avg, avg_perc 
+
  
  # Setting colours
 COLOURS = {
@@ -175,6 +200,13 @@ fraud_percentages = fraud[1]
 false_alarm_percentages = false_alarm[1]
 missed_alarm_percentages = missed_alarm[1]
 
+ # getting transacted ammount and average
+amm_trans = get_tot_avg_ammount(df , previous_day_filter , all_filter)
+
+total_transacted = amm_trans[0]
+ammount_percentage = amm_trans[1]
+avg_transaction = amm_trans[2]
+avg_percentage = amm_trans[3]
 
 
 
@@ -310,3 +342,12 @@ with T1:
             legend_title="Category"
         )
         st.plotly_chart(fig_bar, width="stretch", theme="streamlit")
+
+with T2:
+    k1, k2, k3, k4, k5 = st.columns([1.2,1.2,1,1,1])
+    k1.metric("Ammount Transacted", f"{total_transacted:,}", f"{ammount_percentage:.2f}% {mess}")
+    k2.metric("Average Transaction", f"{avg_transaction:.2f}", f"{avg_percentage:.2f}% {mess}")
+    k3.metric("Average Fraud Probability", f"{fraud_transactions:,}", f"{fraud_percentages:.2f}% {mess}")
+    k4.metric("Max Risk Score", f"{false_alarm_transactions:,}", f"{false_alarm_percentages:.2f}% {mess}")
+    k5.metric("High Risk Transactions", f"{missed_alarm_transactions:,}", f"{missed_alarm_percentages:.2f}% {mess}")
+    st.markdown("---")
