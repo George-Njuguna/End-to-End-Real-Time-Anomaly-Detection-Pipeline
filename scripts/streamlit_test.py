@@ -342,7 +342,7 @@ with T1:
                 )
 
                 fig.update_traces(textinfo='percent+label', rotation = 160) 
-                fig.update_layout(title=f"{filter_trans} Transaction Summary")
+                fig.update_layout(title="Transactions Summary")
 
                 st.plotly_chart(fig, width="stretch", theme="streamlit")
 
