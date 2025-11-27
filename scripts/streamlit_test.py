@@ -89,6 +89,14 @@ def get_transac_n_perc_increase(data, prev_day_filter, all_filter, curr_filter =
     return curr_day_counts, perc
 
  
+ # Setting colours
+COLOURS = {
+    "Valid": "#47622B",
+    "Fraud": "#D7520A",
+    "Missed Alarms": "#E89528",
+    "False Alarms" : "#174B4C"
+
+}
     
 
  # Setting sidebar 
@@ -235,7 +243,9 @@ with T1:
                 fig = px.pie(
                     names=labels,
                     values=values,
-                    hole=0.75,   
+                    hole=0.75,
+                    color=labels,
+                    color_discrete_map=COLOURS   
                 )
 
                 fig.update_traces(textinfo='percent+label', rotation = 160) 
