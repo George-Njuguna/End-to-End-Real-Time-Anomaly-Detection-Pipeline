@@ -91,6 +91,7 @@ def get_transac_n_perc_increase(data, prev_day_filter, all_filter, curr_filter =
  
  # Setting colours
 COLOURS = {
+    "All": "#0077B6",
     "Valid": "#47622B",
     "Fraud": "#D7520A",
     "Missed Alarms": "#E89528",
@@ -104,7 +105,7 @@ st.sidebar.title("Filters and Settings")
 
 
 st.sidebar.markdown("---")
-filter_trans = st.sidebar.selectbox("Transction Type",["All","Fraud","Valid"])
+filter_trans = st.sidebar.selectbox("Transction Type",["Show All","All","Fraud","Valid"])
 start_dt = st.sidebar.date_input("From", value = datetime.date( 2025, 12, 1 ) )
 end_dt = st.sidebar.date_input("To", value = None)
 st.sidebar.markdown("---")
@@ -184,59 +185,85 @@ st.title("Near Time Transaction Monitoring Dashboard")
 T1,T2 = st.tabs(["Overview", "Details"])
 
 with T1:
-    k1, k2, k3, k4, k5 = st.columns([2,2,2,2,2])
-    k1.metric('All Transactions', f"{all_transactions}",f"{all_percentages} {mess}", border=True)
-    k2.metric('Valid Transactions', f"{valid_transactions}" ,f"{valid_percentages} {mess}", border=True)
-    k3.metric('Fradulent Transactions', f"{fraud_transactions}",f"{fraud_percentages} {mess}", border=True)
-    k4.metric('False Alarm', f"{false_alarm_transactions}" ,f"{false_alarm_percentages} {mess}", border=True)
-    k5.metric('Missed Fraud', f"{missed_alarm_transactions}",f"{missed_alarm_percentages} {mess}", border=True )
+    k1, k2, k3, k4, k5 = st.columns([1.2,1.2,1,1,1])
+    k1.metric("All Transactions", f"{all_transactions:,}", f"{all_percentages:.2f}% {mess}")
+    k2.metric("Valid Transactions", f"{valid_transactions:,}", f"{valid_percentages:.2f}% {mess}")
+    k3.metric("Fraudulent Transactions", f"{fraud_transactions:,}", f"{fraud_percentages:.2f}% {mess}")
+    k4.metric("False Alarm", f"{false_alarm_transactions:,}", f"{false_alarm_percentages:.2f}% {mess}")
+    k5.metric("Missed Fraud", f"{missed_alarm_transactions:,}", f"{missed_alarm_percentages:.2f}% {mess}")
     st.markdown("---")
 
     st.header("Overview")
 
     with st.container():
 
+         # sums
         fraud_sum = df.loc[fraud_filter, 'ammount'].sum()
         valid_sum = df.loc[valid_filter, 'ammount'].sum()
         false_alarm_sum = df.loc[false_alarm_filter, 'ammount'].sum()
         missed_alarm_sum = df.loc[missed_alarm_filter, 'ammount'].sum()
 
-         # Two charts
-        col1, col2 = st.columns([3,1])
-        if filter_trans == 'All':
-            df = df
-            values = [valid_sum, fraud_sum, false_alarm_sum, missed_alarm_sum]
-            labels = ["Valid", "Fraud", "False Alarms", "Missed Alarms"]
+        col1, col2 = st.columns([3, 1])
 
-        elif filter_trans == 'Fraud':
-            df = df[fraud_filter]
-            values = [fraud_sum, missed_alarm_sum]
-            labels = [ "Fraud", "Missed Alarms"]
+        all_hourly = df.resample("h", on="processed_at")["ammount"].sum().rolling(3).mean().rename("All")
+        fraud_hourly = df[fraud_filter].resample("h", on="processed_at")["ammount"].sum().rolling(3).mean().rename("Fraud")
+        valid_hourly = df[valid_filter].resample("h", on="processed_at")["ammount"].sum().rolling(3).mean().rename("Valid")
 
-        else:
-            df = df[valid_filter]
-            values = [valid_sum, false_alarm_sum]
-            labels = ["Valid", "False Alarms"]
+        df_hourly = pd.concat([all_hourly, fraud_hourly, valid_hourly], axis=1).reset_index()
 
-        df_hourly = (
-            df.resample('h', on='processed_at')
-            .sum(numeric_only=True)
-            .reset_index()
+
+        if filter_trans == "Show All":
+            
+            df_melted = df_hourly.melt(
+                id_vars="processed_at",
+                value_vars=["All", "Valid", "Fraud"],
+                var_name="category",
+                value_name="amount"
             )
-        df_hourly['amount'] = df_hourly['ammount'].rolling(3).mean()
+            labels = ["Valid", "Fraud", "False Alarms", "Missed Alarms"]
+            values = [valid_sum, fraud_sum, false_alarm_sum, missed_alarm_sum]
 
+        elif filter_trans == "All":
+            
+            df_melted = df_hourly[["processed_at", "All"]].rename(columns={"All": "amount"})
+            labels = ["Valid", "Fraud", "False Alarms", "Missed Alarms"]
+            values = [valid_sum, fraud_sum, false_alarm_sum, missed_alarm_sum]
+
+        elif filter_trans == "Fraud":
+            df_melted = df_hourly[["processed_at", "Fraud"]].rename(columns={"Fraud": "amount"})
+            labels = ["Fraud", "Missed Alarms"]
+            values = [fraud_sum, missed_alarm_sum]
+
+        else:  # Valid
+            df_melted = df_hourly[["processed_at", "Valid"]].rename(columns={"Valid": "amount"})
+            labels = ["Valid", "False Alarms"]
+            values = [valid_sum, false_alarm_sum]
+        
+         # line Chart
         with col1:
             with st.container(border=True):
-                fig = px.line(
-                    df_hourly,
-                    x='processed_at',
-                    y='amount',
-                    line_shape='spline',
-                    title=f"{filter_trans} Transactions Over Time",
+                if filter_trans == "Show All":
+                    fig = px.line(
+                        df_melted,
+                        x="processed_at",
+                        y="amount",
+                        color="category",
+                        color_discrete_map=COLOURS,
+                        line_shape="spline",
+                        title="Valid, Fraud & Total Transactions Over Time"
                     )
-                
-                fig.update_traces(mode='lines+markers')
-                st.plotly_chart(fig, width="stretch",theme="streamlit")
+                else:
+                    fig = px.line(
+                        df_melted,
+                        x="processed_at",
+                        y="amount",
+                        line_shape="spline",
+                        title=f"{filter_trans} Transactions Over Time",
+                        color_discrete_sequence=[COLOURS.get(filter_trans, "#2196F3")]
+                    )
+
+                fig.update_traces(mode="lines+markers")
+                st.plotly_chart(fig, width='stretch', theme="streamlit")
 
         with col2:
             with st.container(border=True):
