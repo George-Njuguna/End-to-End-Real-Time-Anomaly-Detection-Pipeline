@@ -211,7 +211,7 @@ with T1:
             labels = ["Valid", "False Alarms"]
 
         df_hourly = (
-            df.resample('H', on='processed_at')
+            df.resample('h', on='processed_at')
             .sum(numeric_only=True)
             .reset_index()
             )
@@ -228,7 +228,7 @@ with T1:
                     )
                 
                 fig.update_traces(mode='lines+markers')
-                st.plotly_chart(fig, use_container_width=True,theme="streamlit")
+                st.plotly_chart(fig, width="stretch",theme="streamlit")
 
         with col2:
             with st.container(border=True):
@@ -238,7 +238,7 @@ with T1:
                     hole=0.75,   
                 )
 
-                fig.update_traces(textinfo='percent', rotation = 120) 
-                fig.update_layout(title=f"{filter_trans}Transaction Summary")
+                fig.update_traces(textinfo='percent+label', rotation = 160) 
+                fig.update_layout(title=f"{filter_trans} Transaction Summary")
 
-                st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+                st.plotly_chart(fig, width="stretch", theme="streamlit")
