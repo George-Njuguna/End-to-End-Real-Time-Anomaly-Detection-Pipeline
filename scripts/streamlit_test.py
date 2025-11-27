@@ -115,14 +115,18 @@ def get_tot_avg_ammount(data, prev_day_filter, all_filter):
 
 
 def get_avg_max_risk(data, prev_day_filter, all_filter):
+    filter = df['probability'] >= 75
      # getting data counts that was before curr date 
     prev_day_data = data[prev_day_filter]
     previous_day_sum = (prev_day_data["probability"].sum())
+    prev_day_risk_sum = ((df[filter]).shape)[0]
 
      # getting data counts on the current date range
     curr_day_data = data[all_filter]   
     curr_day_sum = (curr_day_data["probability"].sum())
     max_risk = (curr_day_data["probability"].max())
+    curr_day_fil_data = df[filter]
+    curr_high_risk_sum = (curr_day_fil_data.shape)[0] 
     
      # getting avg 
     avg = curr_day_sum / (curr_day_data.shape)[0]
@@ -130,13 +134,15 @@ def get_avg_max_risk(data, prev_day_filter, all_filter):
      # getting the percentages increase
     if previous_day_sum == 0:
         avg_perc = np.nan
+        high_risk_perc = np.nan
 
     else:
         avg_prev = previous_day_sum / (prev_day_data.shape)[0]
 
         avg_perc = ((avg-avg_prev)/avg_prev)*100
+        high_risk_perc =((curr_high_risk_sum - prev_day_risk_sum)/prev_day_risk_sum)*100
     
-    return max_risk, avg, avg_perc 
+    return max_risk, avg, avg_perc, curr_high_risk_sum, high_risk_perc
 
  
  # Setting colours
@@ -238,6 +244,8 @@ risk = get_avg_max_risk(df , previous_day_filter , all_filter)
 max_risk = risk[0]
 avg_risk = risk[1]
 avg_risk_perc = risk[2]
+high_risk_sum = risk[3]
+high_risk_perc = risk[4]
 
 
  # Setting the header and KPI
@@ -379,5 +387,5 @@ with T2:
     k2.metric("Average Transaction", f"{avg_transaction:.2f}$", f"{avg_percentage:.2f}% {mess}")
     k3.metric("Average Risk Score", f"{avg_risk:.2f}%", f"{avg_risk_perc:.2f}% {mess}")
     k4.metric("Max Risk Score", f"{max_risk:.2f}%")
-    k5.metric("High Risk Transactions", f"{missed_alarm_transactions:,}", f"{missed_alarm_percentages:.2f}% {mess}")
+    k5.metric("High Risk Transactions", f"{high_risk_sum:,}", f"{high_risk_perc:.2f}% {mess}")
     st.markdown("---")
