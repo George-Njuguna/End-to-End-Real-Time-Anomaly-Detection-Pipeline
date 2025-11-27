@@ -345,8 +345,8 @@ with T1:
 
 with T2:
     k1, k2, k3, k4, k5 = st.columns([1.2,1.2,1,1,1])
-    k1.metric("Ammount Transacted", f"{total_transacted:,}", f"{ammount_percentage:.2f}% {mess}")
-    k2.metric("Average Transaction", f"{avg_transaction:.2f}", f"{avg_percentage:.2f}% {mess}")
+    k1.metric("Ammount Transacted", f"{total_transacted:,}$", f"{ammount_percentage:.2f}% {mess}")
+    k2.metric("Average Transaction", f"{avg_transaction:.2f}$", f"{avg_percentage:.2f}% {mess}")
     k3.metric("Average Fraud Probability", f"{fraud_transactions:,}", f"{fraud_percentages:.2f}% {mess}")
     k4.metric("Max Risk Score", f"{false_alarm_transactions:,}", f"{false_alarm_percentages:.2f}% {mess}")
     k5.metric("High Risk Transactions", f"{missed_alarm_transactions:,}", f"{missed_alarm_percentages:.2f}% {mess}")
