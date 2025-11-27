@@ -113,6 +113,31 @@ def get_tot_avg_ammount(data, prev_day_filter, all_filter):
     
     return curr_day_ammount, perc, avg, avg_perc 
 
+
+def get_avg_max_risk(data, prev_day_filter, all_filter):
+     # getting data counts that was before curr date 
+    prev_day_data = data[prev_day_filter]
+    previous_day_sum = (prev_day_data["probability"].sum())
+
+     # getting data counts on the current date range
+    curr_day_data = data[all_filter]   
+    curr_day_sum = (curr_day_data["probability"].sum())
+    max_risk = (curr_day_data["probability"].max())
+    
+     # getting avg 
+    avg = curr_day_sum / (curr_day_data.shape)[0]
+
+     # getting the percentages increase
+    if previous_day_sum == 0:
+        avg_perc = np.nan
+
+    else:
+        avg_prev = previous_day_sum / (prev_day_data.shape)[0]
+
+        avg_perc = ((avg-avg_prev)/avg_prev)*100
+    
+    return max_risk, avg, avg_perc 
+
  
  # Setting colours
 COLOURS = {
@@ -208,6 +233,11 @@ ammount_percentage = amm_trans[1]
 avg_transaction = amm_trans[2]
 avg_percentage = amm_trans[3]
 
+risk = get_avg_max_risk(df , previous_day_filter , all_filter)
+
+max_risk = risk[0]
+avg_risk = risk[1]
+avg_risk_perc = risk[2]
 
 
  # Setting the header and KPI
@@ -347,7 +377,7 @@ with T2:
     k1, k2, k3, k4, k5 = st.columns([1.2,1.2,1,1,1])
     k1.metric("Ammount Transacted", f"{total_transacted:,}$", f"{ammount_percentage:.2f}% {mess}")
     k2.metric("Average Transaction", f"{avg_transaction:.2f}$", f"{avg_percentage:.2f}% {mess}")
-    k3.metric("Average Fraud Probability", f"{fraud_transactions:,}", f"{fraud_percentages:.2f}% {mess}")
-    k4.metric("Max Risk Score", f"{false_alarm_transactions:,}", f"{false_alarm_percentages:.2f}% {mess}")
+    k3.metric("Average Fraud Probability", f"{avg_risk:.2f}%", f"{avg_risk_perc:.2f}% {mess}")
+    k4.metric("Max Risk Score", f"{max_risk:.2f}%")
     k5.metric("High Risk Transactions", f"{missed_alarm_transactions:,}", f"{missed_alarm_percentages:.2f}% {mess}")
     st.markdown("---")
