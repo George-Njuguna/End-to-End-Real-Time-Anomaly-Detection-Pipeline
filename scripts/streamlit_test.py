@@ -16,6 +16,8 @@ import os
 from dotenv import load_dotenv
 from functions import import_data
 import datetime
+from scipy.stats import gaussian_kde
+import plotly.graph_objects as go
 
 load_dotenv()
 
@@ -204,7 +206,7 @@ else:
 
 
 
-
+ # Transactions.
 all_filter = df['processed_at'].between(start_date, end_date)
 valid_filter = ((df['fraud'] == 0) & (df['prediction'] == 0))
 fraud_filter = ((df['fraud'] == 1) & (df['prediction'] == 1))
@@ -246,6 +248,9 @@ avg_risk = risk[1]
 avg_risk_perc = risk[2]
 high_risk_sum = risk[3]
 high_risk_perc = risk[4]
+
+ # probabilities
+
 
 
  # Setting the header and KPI
@@ -389,3 +394,43 @@ with T2:
     k4.metric("Max Risk Score", f"{max_risk:.2f}%")
     k5.metric("High Risk Transactions", f"{high_risk_sum:,}", f"{high_risk_perc:.2f}% {mess}")
     st.markdown("---")
+
+    # adding histogram 
+    data = df[((df['processed_at'] >= start_date) & (df['processed_at'] >= start_date))]
+
+    probs = data["probability"].dropna().values
+
+    # KDE calculation
+    kde = gaussian_kde(probs)
+    x_range = np.linspace(probs.min(), probs.max(), 200)
+    kde_values = kde(x_range)
+
+    with st.container(border=True):
+        # Plotly figure
+        fig = go.Figure()
+
+        # Histogram
+        fig.add_trace(go.Histogram(
+            x=probs,
+            histnorm='probability density',
+            opacity=0.5,
+            name="Histogram"
+        ))
+
+        # KDE curve
+        fig.add_trace(go.Scatter(
+            x=x_range,
+            y=kde_values,
+            mode='lines',
+            name="KDE",
+            line=dict(width=3)
+        ))
+
+        fig.update_layout(
+            title="Probability Distribution",
+            xaxis_title="Probability",
+            yaxis_title="Density",
+            bargap=0.1
+        )
+
+        st.plotly_chart(fig, use_container_width=True, theme="streamlit")
