@@ -283,8 +283,8 @@ with T1:
         all_hourly = df.resample("h", on="processed_at")["ammount"].sum().rolling(3).mean().rename("All")
         fraud_hourly = df[fraud_filter].resample("h", on="processed_at")["ammount"].sum().rolling(3).mean().rename("Fraud")
         valid_hourly = df[valid_filter].resample("h", on="processed_at")["ammount"].sum().rolling(3).mean().rename("Valid")
-        false_alarm_hourly = df[false_alarm_filter].resample("H", on="processed_at")["ammount"].sum().rolling(3).mean().rename("False Alarms")
-        missed_alarm_hourly = df[missed_alarm_filter].resample("H", on="processed_at")["ammount"].sum().rolling(3).mean().rename("Missed Alarms")
+        false_alarm_hourly = df[false_alarm_filter].resample("h", on="processed_at")["ammount"].sum().rolling(3).mean().rename("False Alarms")
+        missed_alarm_hourly = df[missed_alarm_filter].resample("h", on="processed_at")["ammount"].sum().rolling(3).mean().rename("Missed Alarms")
 
         df_hourly = pd.concat([all_hourly, fraud_hourly, valid_hourly, false_alarm_hourly, missed_alarm_hourly], axis=1).reset_index()
 
@@ -395,6 +395,8 @@ with T2:
     k5.metric("High Risk Transactions", f"{high_risk_sum:,}", f"{high_risk_perc:.2f}% {mess}")
     st.markdown("---")
 
+    col1, col2 = st.columns([3, 1])
+
     # adding histogram 
     data = df[((df['processed_at'] >= start_date) & (df['processed_at'] >= start_date))]
 
@@ -405,32 +407,45 @@ with T2:
     x_range = np.linspace(probs.min(), probs.max(), 200)
     kde_values = kde(x_range)
 
-    with st.container(border=True):
-        # Plotly figure
-        fig = go.Figure()
+    with st.container():
+        with col1:
+            with st.container(border=True):
+                # Plotly figure
+                fig = go.Figure()
 
-        # Histogram
-        fig.add_trace(go.Histogram(
-            x=probs,
-            histnorm='probability density',
-            opacity=0.5,
-            name="Histogram"
-        ))
+                # Histogram
+                fig.add_trace(go.Histogram(
+                    x=probs,
+                    histnorm='probability density',
+                    opacity=0.5,
+                    name="Histogram"
+                ))
 
-        # KDE curve
-        fig.add_trace(go.Scatter(
-            x=x_range,
-            y=kde_values,
-            mode='lines',
-            name="KDE",
-            line=dict(width=3)
-        ))
+                # KDE curve
+                fig.add_trace(go.Scatter(
+                    x=x_range,
+                    y=kde_values,
+                    mode='lines',
+                    name="KDE",
+                    line=dict(width=3)
+                ))
 
-        fig.update_layout(
-            title="Probability Distribution",
-            xaxis_title="Probability",
-            yaxis_title="Density",
-            bargap=0.1
-        )
+                fig.update_layout(
+                    title="Probability Distribution",
+                    xaxis_title="Probability",
+                    yaxis_title="Density",
+                    bargap=0.1
+                )
 
-        st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+                st.plotly_chart(fig, width="stretch", theme="streamlit")
+        
+        with col2:
+            with st.container(border=True):
+                fig = px.violin(
+                    data,
+                    x="probability",
+                    box=True,
+                    points="all",
+                    title="Probability Distribution (Violin Plot)"
+                )
+                st.plotly_chart(fig, width="stretch", theme="streamlit")
