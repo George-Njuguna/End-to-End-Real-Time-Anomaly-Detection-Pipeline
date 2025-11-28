@@ -365,7 +365,7 @@ with T1:
         # Melt for stacked bars
         df_bar_melted = df_hourly.melt(
             id_vars="processed_at",
-            value_vars=["Valid", "Fraud", "False Alarms", "Missed Alarms"],
+            value_vars=labels,
             var_name="category",
             value_name="amount"
         )
