@@ -526,5 +526,5 @@ with T2:
                 table_data["category"] = table_data.apply(categorize, axis=1)
 
                 styled_df = table_data[["transaction_id", "processed_at", "ammount", "probability","category"]].style.apply(row_text_color, axis=1)
-
+                st.header("Current Transactions")
                 st.dataframe(styled_df, width="stretch")
