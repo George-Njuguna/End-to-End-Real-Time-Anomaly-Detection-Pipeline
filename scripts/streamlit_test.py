@@ -146,7 +146,21 @@ def get_avg_max_risk(data, prev_day_filter, all_filter):
     
     return max_risk, avg, avg_perc, curr_high_risk_sum, high_risk_perc
 
- 
+def categorize(row):
+    if row["fraud"] == 1:
+        return "Fraud"
+    elif row["fraud"] == 0 and row["prediction"] == 1:
+        return "False Alarms"
+    elif row["fraud"] == 1 and row["prediction"] == 0:
+        return "Missed Alarms"
+    else:
+        return "Valid"
+    
+# Function to color text in a column
+def row_text_color(row):
+    color = COLOURS.get(row["category"], "black")
+    return [f'color: {color}']*len(row)
+
  # Setting colours
 COLOURS = {
     "All": "#0077B6",
@@ -450,7 +464,7 @@ with T2:
                 )
                 st.plotly_chart(fig, width="stretch", theme="streamlit")
 
-    col3, col4, col5= st.columns([0.7,0.7,2])
+    col3, col4, col5= st.columns([1,1,2])
     with st.container():
         with col3:
             with st.container(border=True):
@@ -503,3 +517,14 @@ with T2:
                 )
 
                 st.plotly_chart(fig_false_missed, width="stretch",theme="streamlit")
+
+        with col5:
+            with st.container():
+
+                table_data = ((df.sort_values(by='processed_at',ascending = False )).reset_index()).head(limit_rows) 
+
+                table_data["category"] = table_data.apply(categorize, axis=1)
+
+                styled_df = table_data[["transaction_id", "processed_at", "ammount", "probability","category"]].style.apply(row_text_color, axis=1)
+
+                st.dataframe(styled_df, width="stretch")
