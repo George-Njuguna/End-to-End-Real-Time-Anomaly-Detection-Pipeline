@@ -521,6 +521,13 @@ with T2:
         with col5:
             with st.container():
 
+                if filter_trans == "Show All" or filter_trans == "All":
+                    df = df[all_filter]
+                elif filter_trans == "Fraud":
+                    df = df[false_alarm_filter | fraud_filter]
+                else:
+                    df = df[missed_alarm_filter | valid_filter]
+
                 table_data = ((df.sort_values(by='processed_at',ascending = False )).reset_index()).head(limit_rows) 
 
                 table_data["category"] = table_data.apply(categorize, axis=1)
