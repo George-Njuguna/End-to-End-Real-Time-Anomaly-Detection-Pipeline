@@ -449,3 +449,57 @@ with T2:
                     title="Probability Distribution (Violin Plot)"
                 )
                 st.plotly_chart(fig, width="stretch", theme="streamlit")
+
+    col3, col4, col5= st.columns([0.7,0.7,2])
+    with st.container():
+        with col3:
+            with st.container(border=True):
+                fig_valid_fraud = go.Figure()
+
+                fig_valid_fraud.add_trace(go.Bar(
+                    x=["Valid", "Fraud"],
+                    width=[0.3, 0.3],
+                    y=[valid_transactions, fraud_transactions],
+                    text=[valid_transactions, fraud_transactions],
+                    textposition="outside",
+                    marker=dict(
+                        line=dict(width=0),
+                        opacity=0.85
+                    )
+                ))
+
+                fig_valid_fraud.update_layout(
+                    title="Valid vs Fraud Transactions",
+                    xaxis_title="Transaction Type",
+                    yaxis_title="Count",
+                    bargap=0.3,
+                    showlegend=False
+                )
+
+                st.plotly_chart(fig_valid_fraud, width="stretch", theme="streamlit")
+
+        with col4:
+            with st.container(border=True):
+                fig_false_missed = go.Figure()
+
+                fig_false_missed.add_trace(go.Bar(
+                    x=["False Alarm", "Missed Fraud"],
+                    width=[0.3, 0.3],
+                    y=[false_alarm_transactions, missed_alarm_transactions],
+                    text=[false_alarm_transactions, missed_alarm_transactions],
+                    textposition="outside",
+                    marker=dict(
+                        line=dict(width=0),
+                        opacity=0.85
+                    )
+                ))
+
+                fig_false_missed.update_layout(
+                    title="False Alarm vs Missed Fraud",
+                    xaxis_title="Category",
+                    yaxis_title="Count",
+                    bargap=0.3,
+                    showlegend=False
+                )
+
+                st.plotly_chart(fig_false_missed, width="stretch",theme="streamlit")
