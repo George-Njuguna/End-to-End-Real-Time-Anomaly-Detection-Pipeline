@@ -1,10 +1,3 @@
-''' Build an app that:
-1.  Lets user upload a CSV.
-2.  Displays the head() of the DataFrame.
-3.  Has a selectbox for choosing one column.
-4.  Displays summary statistics of that column (df[column].describe()).
-'''
-
 import streamlit as st
 import pandas as pd
 import numpy as np
