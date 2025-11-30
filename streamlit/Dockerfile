@@ -2,19 +2,12 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-
-RUN apt-get update && apt-get install -y build-essential
-
-
+# Copy requirements and install
 COPY requirements.txt .
-
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy .env (optional)
+COPY .env ./
 
-COPY . .
-
-
-EXPOSE 8501
-
-
-CMD ["streamlit", "run", "app.py", "--server.address=0.0.0.0", "--server.port=8501"]
+# Command to run your mounted script
+CMD ["streamlit", "run", "/app/scripts/streamlit_test.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.headless=true"]

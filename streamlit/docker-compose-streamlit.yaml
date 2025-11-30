@@ -9,7 +9,7 @@ services:
     ports:
       - "8501:8501"
     volumes:
-      - ./scripts:/app/scripts  # optional: for live edits
+      - G:/PYTHON_PROJECTS/Scripts/Fraud_Detection_Pipeline/scripts:/app/scripts
     env_file:
       - .env
     networks:
