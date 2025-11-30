@@ -477,6 +477,7 @@ with T2:
                     textposition="outside",
                     marker=dict(
                         line=dict(width=0),
+                        color=["#47622B", "#D7520A"],
                         opacity=0.85
                     )
                 ))
@@ -493,29 +494,22 @@ with T2:
 
         with col4:
             with st.container(border=True):
-                fig_false_missed = go.Figure()
+                
 
-                fig_false_missed.add_trace(go.Bar(
-                    x=["False Alarm", "Missed Fraud"],
-                    width=[0.3, 0.3],
-                    y=[false_alarm_transactions, missed_alarm_transactions],
-                    text=[false_alarm_transactions, missed_alarm_transactions],
-                    textposition="outside",
-                    marker=dict(
-                        line=dict(width=0),
-                        opacity=0.85
-                    )
-                ))
-
-                fig_false_missed.update_layout(
-                    title="False Alarm vs Missed Fraud",
-                    xaxis_title="Category",
-                    yaxis_title="Count",
-                    bargap=0.3,
-                    showlegend=False
+                # Display metrics vertically
+                st.metric(
+                    label="False Alarms",
+                    value=f"{false_alarm_transactions:,}",
+                    delta = f"{false_alarm_percentages} {mess}"
                 )
 
-                st.plotly_chart(fig_false_missed, width="stretch",theme="streamlit")
+                st.divider()
+
+                st.metric(
+                    label="Missed Frauds",
+                    value=f"{missed_alarm_transactions:,}",
+                    delta = f"{missed_alarm_percentages} {mess}"
+                )
 
         with col5:
             with st.container():
