@@ -9,7 +9,6 @@ from datetime import datetime, date
 table_name = 'streaming_data'
 last_id_table = 'transaction_id_table'
 batch_table = 'batch_table'
-table2 = "streaming_data_test"
 msg_count= 0
 batches = 0
 
@@ -47,7 +46,7 @@ producer = KafkaProducer(
 print("Producer started...")
 
 while True:
-    transactions = fetch_batch_data(table2, batch, conn, last_id)
+    transactions = fetch_batch_data(table_name, batch, conn, last_id)
 
     if not transactions or msg_count >= batch:
         print("✅ No more transactions left to stream. Stopping producer.")
