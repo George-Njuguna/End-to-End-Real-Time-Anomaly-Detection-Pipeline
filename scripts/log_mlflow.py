@@ -95,27 +95,8 @@ def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling, mo
 
 
 # Getting all experiments from a specific domain and getting best run 
-from mlflow.tracking import MlflowClient
-import mlflow
 
 def get_best_run_from_domain(domain, metric, tracking_uri):
-    """
-    Get the best run ID for a given domain, prioritizing the highest metric,
-    and if tied, the most recent run.
-
-    Parameters
-    ----------
-    domain : str
-        Domain tag in MLflow runs
-    metric : str
-        Performance metric to rank runs
-    tracking_uri : str
-        MLflow tracking URI
-
-    Returns
-    -------
-    best_run_id : str or None
-    """
     if not isinstance(domain, str):
         raise ValueError("Input 'domain' must be a string representing the domain tag")
     if not isinstance(metric, str):
@@ -125,8 +106,8 @@ def get_best_run_from_domain(domain, metric, tracking_uri):
     client = MlflowClient()
 
     try:
-        # Get all experiments
-        experiments = client.list_experiments()
+        # Use search_experiments() instead of list_experiments()
+        experiments = client.search_experiments()  # returns list of Experiment objects
         if not experiments:
             print(f"No experiments found.")
             return None
@@ -146,13 +127,13 @@ def get_best_run_from_domain(domain, metric, tracking_uri):
             return None
 
         best_run = runs[0]
-        print(f"BEST RUN = {best_run.info.run_id}, BEST {metric} SCORE = {best_run.data.metrics.get(metric):.4f}, START TIME = {best_run.info.start_time}")
+        start_time_dt = datetime.fromtimestamp(best_run.info.start_time / 1000.0)
+        print(f"BEST RUN = {best_run.info.run_id}, BEST {metric} SCORE = {best_run.data.metrics.get(metric):.4f}, START TIME = {start_time_dt}")
         return best_run.info.run_id
 
     except Exception as e:
         print(f"ERROR IN get_best_run_from_domain: {e}")
         return None
-
 
 
 
