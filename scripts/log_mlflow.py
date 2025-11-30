@@ -95,60 +95,64 @@ def mlflow_pipe(model_info, tracking_uri,experiment_name, imbalance_handling, mo
 
 
 # Getting all experiments from a specific domain and getting best run 
+from mlflow.tracking import MlflowClient
+import mlflow
+
 def get_best_run_from_domain(domain, metric, tracking_uri):
-    if not isinstance( domain, str ):
-        raise ValueError("Input 'domain' must be a string repin domain tag")
-    if not isinstance( metric, str ):
-        raise ValueError("Input 'metric' must be a string repin the performance metric")
-    """ 
-    gets best run id based on the highest 'metric'  
+    """
+    Get the best run ID for a given domain, prioritizing the highest metric,
+    and if tied, the most recent run.
 
     Parameters
     ----------
-    domain : str that representing the domain tag in a run in mlflow
-    metric : metric ie F1_score , Recall etc
-    tracking_uri : str , tracking uri of mlflow
+    domain : str
+        Domain tag in MLflow runs
+    metric : str
+        Performance metric to rank runs
+    tracking_uri : str
+        MLflow tracking URI
 
     Returns
     -------
-    best_run_id
+    best_run_id : str or None
     """
-    mlflow.set_tracking_uri( uri = tracking_uri )
+    if not isinstance(domain, str):
+        raise ValueError("Input 'domain' must be a string representing the domain tag")
+    if not isinstance(metric, str):
+        raise ValueError("Input 'metric' must be a string representing the performance metric")
+
+    mlflow.set_tracking_uri(tracking_uri)
     client = MlflowClient()
 
     try:
-
-        experiments = client.search_experiments()
-        best_run = None
-        best_score = float('-inf')
-
-        for exp in experiments:
-            runs = client.search_runs(
-                experiment_ids=[exp.experiment_id],
-                filter_string=f"tags.domain = '{domain}'",
-                order_by=[f"metrics.{metric} DESC"],
-                max_results=1
-            )
-
-            if runs and len(runs) > 0:
-                run = runs[0]
-                score = run.data.metrics.get(metric, None)
-
-                if score is not None and score > best_score:
-                    best_score = score
-                    best_run = run
-
-        if best_run is None:
-            print(f"No runs with metric '{metric}' found in domain '{domain}'.")
+        # Get all experiments
+        experiments = client.list_experiments()
+        if not experiments:
+            print(f"No experiments found.")
             return None
 
-        best_run_id = best_run.info.run_id
-        print(f"BEST RUN = {best_run_id}, BEST {metric} SCORE = {best_score:.4f}")
-        return best_run_id
+        experiment_ids = [exp.experiment_id for exp in experiments]
+
+        # Search runs across all experiments, ordered by metric DESC, then start_time DESC
+        runs = client.search_runs(
+            experiment_ids=experiment_ids,
+            filter_string=f"tags.domain = '{domain}'",
+            order_by=[f"metrics.{metric} DESC", "start_time DESC"],
+            max_results=1
+        )
+
+        if not runs:
+            print(f"No runs found for domain '{domain}' with metric '{metric}'.")
+            return None
+
+        best_run = runs[0]
+        print(f"BEST RUN = {best_run.info.run_id}, BEST {metric} SCORE = {best_run.data.metrics.get(metric):.4f}, START TIME = {best_run.info.start_time}")
+        return best_run.info.run_id
 
     except Exception as e:
         print(f"ERROR IN get_best_run_from_domain: {e}")
         return None
+
 
 
 
