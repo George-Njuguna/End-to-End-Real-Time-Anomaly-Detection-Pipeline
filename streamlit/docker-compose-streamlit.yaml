@@ -1,27 +1,21 @@
+version: '3.8'
+
 services:
   streamlit:
-    image: python:3.11-slim
+    build:
+      context: .  
+      dockerfile: Dockerfile
     container_name: streamlit-dashboard
-    working_dir: /app
-    command: >
-      bash -c "
-      pip install --no-cache-dir -r requirements.txt &&
-      streamlit run app.py --server.port=8501 --server.address=0.0.0.0
-      "
     ports:
       - "8501:8501"
     volumes:
-      - ./scripts:/streamlit_test
-    environment:
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      POSTGRES_PORT: ${POSTGRES_PORT}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PW}
+      - ./scripts:/app/scripts  # optional: for live edits
+    env_file:
+      - .env
     networks:
-      -  fraud_network
+      - fraud_network
 
 networks:
   fraud_network:
-    external: true  
-    
+    external: true 
+
