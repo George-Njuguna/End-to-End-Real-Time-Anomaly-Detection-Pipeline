@@ -274,12 +274,11 @@ st.title("Near Time Transaction Monitoring Dashboard")
 T1,T2 = st.tabs(["Overview", "Details"])
 
 with T1:
-    k1, k2, k3, k4, k5 = st.columns([1.2,1.2,1,1,1])
+    k1, k2, k3 = st.columns([1,1,1])
     k1.metric("All Transactions", f"{all_transactions:,}", f"{all_percentages:.2f}% {mess}")
-    k2.metric("Valid Transactions", f"{valid_transactions:,}", f"{valid_percentages:.2f}% {mess}")
-    k3.metric("Fraudulent Transactions", f"{fraud_transactions:,}", f"{fraud_percentages:.2f}% {mess}")
-    k4.metric("False Alarm", f"{false_alarm_transactions:,}", f"{false_alarm_percentages:.2f}% {mess}")
-    k5.metric("Missed Fraud", f"{missed_alarm_transactions:,}", f"{missed_alarm_percentages:.2f}% {mess}")
+    k2.metric("Ammount Transacted", f"{total_transacted:,}$", f"{ammount_percentage:.2f}% {mess}")
+    k3.metric("Average Transaction", f"{avg_transaction:.2f}$", f"{avg_percentage:.2f}% {mess}")
+
     st.markdown("---")
 
     st.header("Overview")
@@ -401,9 +400,9 @@ with T1:
         st.plotly_chart(fig_bar, width="stretch", theme="streamlit")
 
 with T2:
-    k1, k2, k3, k4, k5 = st.columns([1.2,1.2,1,1,1])
-    k1.metric("Ammount Transacted", f"{total_transacted:,}$", f"{ammount_percentage:.2f}% {mess}")
-    k2.metric("Average Transaction", f"{avg_transaction:.2f}$", f"{avg_percentage:.2f}% {mess}")
+    k1, k2, k3, k4, k5 = st.columns([1,1,1,1,1])
+    k1.metric("Valid Transactions", f"{valid_transactions:,}", f"{valid_percentages:.2f}% {mess}")
+    k2.metric("Fraudulent Transactions", f"{fraud_transactions:,}", f"{fraud_percentages:.2f}% {mess}")
     k3.metric("Average Risk Score", f"{avg_risk:.2f}%", f"{avg_risk_perc:.2f}% {mess}")
     k4.metric("Max Risk Score", f"{max_risk:.2f}%")
     k5.metric("High Risk Transactions", f"{high_risk_sum:,}", f"{high_risk_perc:.2f}% {mess}")
