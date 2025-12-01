@@ -169,28 +169,6 @@ This offers complete transparency into the fraud detection lifecycle.
                  │ - Fraud dashboard (real-time + historical) │
                  └────────────────────────────────────────────┘
 
-#####  **Installation & Setup**
-
-1. Clone the Repository
-
-git clone https://github.com/your-username/fraud-detection-pipeline.git
-cd fraud-detection-pipeline
-
-2. Build and Start the System
-
-docker-compose up --build
-
-3. Access the Services
-
-Service	URL
-Streamlit Dashboard	http://localhost:8501
-
-Airflow Web UI	http://localhost:8080
-
-MLflow UI	http://localhost:5000
-
-PostgreSQL	localhost:5432
-Kafka Broker	localhost:9092
 
 
 ##### 📄 Requirements
