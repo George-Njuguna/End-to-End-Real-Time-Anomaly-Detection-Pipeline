@@ -62,16 +62,17 @@ def load_cached_data(table):
 df = load_cached_data(table)
 
 def get_transac_n_perc_increase(data, prev_day_filter, all_filter, curr_filter = None ):
-     # getting data counts that was before curr date 
-    prev_day_data = data[prev_day_filter]
-    previous_day_counts = (prev_day_data.shape)[0]
 
      # getting data counts on the current date range
     if curr_filter is None:
+        prev_day_data = data[prev_day_filter]
+        previous_day_counts = (prev_day_data.shape)[0]
         curr_day_data = data[all_filter]   
         curr_day_counts = (curr_day_data.shape)[0]
 
     else:
+        prev_day_data = data[prev_day_filter&all_filter]
+        previous_day_counts = (prev_day_data.shape)[0]
         curr_day_data = data[all_filter&curr_filter]   
         curr_day_counts = (curr_day_data.shape)[0]
 
@@ -214,7 +215,7 @@ else:
 
 
  # Transactions.
-all_filter = df['processed_at'].between(start_date, end_date)
+all_filter = ((df['processed_at']>= start_date) & (df['processed_at']<= end_date))
 valid_filter = ((df['fraud'] == 0) & (df['prediction'] == 0))
 fraud_filter = ((df['fraud'] == 1) & (df['prediction'] == 1))
 false_alarm_filter = ((df['fraud'] == 0) & (df['prediction'] == 1))
@@ -275,6 +276,8 @@ with T1:
     st.markdown("---")
 
     st.header("Overview")
+
+    df = df[all_filter]
 
     with st.container():
 
@@ -402,9 +405,9 @@ with T2:
     st.markdown("---")
 
     col1, col2 = st.columns([3, 1])
-
+    
     # adding histogram 
-    data = df[((df['processed_at'] >= start_date) & (df['processed_at'] >= start_date))]
+    data = df[all_filter]
 
     probs = data["probability"].dropna().values
 
@@ -506,6 +509,7 @@ with T2:
 
         with col5:
             with st.container():
+                df = df[all_filter]
 
                 if filter_trans == "Show All" or filter_trans == "All":
                     df = df[all_filter]
