@@ -55,7 +55,7 @@ def get_connection():
 # Cache the data load
 @st.cache_data(ttl=60)
 def load_cached_data(table):
-    conn = get_connection()   # get cached connection
+    conn = get_connection()  
     return import_data(table, conn)
 
 # load data
@@ -257,9 +257,6 @@ avg_risk_perc = risk[2]
 high_risk_sum = risk[3]
 high_risk_perc = risk[4]
 
- # probabilities
-
-
 
  # Setting the header and KPI
 st.title("Near Time Transaction Monitoring Dashboard")
@@ -371,7 +368,6 @@ with T1:
      # bar graphs
 
     with st.container(border=True):
-        # Melt for stacked bars
         df_bar_melted = df_hourly.melt(
             id_vars="processed_at",
             value_vars=labels,
