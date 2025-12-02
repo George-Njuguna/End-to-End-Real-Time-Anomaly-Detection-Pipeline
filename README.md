@@ -52,9 +52,9 @@ Each day, Airflow triggers a DAG that:
 
 - Updates a batch-tracking table so:
 
-        No batch loads more than once
+  - No batch loads more than once
 
-        Duplicates are prevented using transaction_id checks
+  - Duplicates are prevented using transaction_id checks
 
 **2. Batch Deduplication Strategy**
 
