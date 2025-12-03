@@ -71,7 +71,7 @@ def get_transac_n_perc_increase(data, prev_day_filter, all_filter, curr_filter =
         curr_day_counts = (curr_day_data.shape)[0]
 
     else:
-        prev_day_data = data[prev_day_filter&all_filter]
+        prev_day_data = data[prev_day_filter&curr_filter]
         previous_day_counts = (prev_day_data.shape)[0]
         curr_day_data = data[all_filter&curr_filter]   
         curr_day_counts = (curr_day_data.shape)[0]
@@ -492,7 +492,7 @@ with T2:
                 st.metric(
                     label="False Alarms",
                     value=f"{false_alarm_transactions:,}",
-                    delta = f"{false_alarm_percentages} {mess}"
+                    delta = f"{false_alarm_percentages:.2f}% {mess}"
                 )
 
                 st.divider()
@@ -500,7 +500,7 @@ with T2:
                 st.metric(
                     label="Missed Frauds",
                     value=f"{missed_alarm_transactions:,}",
-                    delta = f"{missed_alarm_percentages} {mess}"
+                    delta = f"{missed_alarm_percentages:.2f}% {mess}"
                 )
 
         with col5:
