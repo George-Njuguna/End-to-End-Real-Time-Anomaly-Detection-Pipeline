@@ -267,7 +267,7 @@ T1,T2 = st.tabs(["Overview", "Details"])
 with T1:
     k1, k2, k3 = st.columns([1,1,1])
     k1.metric("All Transactions", f"{all_transactions:,}", f"{all_percentages:.2f}% {mess}")
-    k2.metric("Ammount Transacted", f"{total_transacted:,}$", f"{ammount_percentage:.2f}% {mess}")
+    k2.metric("Ammount Transacted", f"{total_transacted:.2f}$", f"{ammount_percentage:.2f}% {mess}")
     k3.metric("Average Transaction", f"{avg_transaction:.2f}$", f"{avg_percentage:.2f}% {mess}")
 
     st.markdown("---")
@@ -510,9 +510,9 @@ with T2:
                 if filter_trans == "Show All" or filter_trans == "All":
                     df = df[all_filter]
                 elif filter_trans == "Fraud":
-                    df = df[false_alarm_filter | fraud_filter]
+                    df = df[missed_alarm_filter | false_alarm_filter | fraud_filter]
                 else:
-                    df = df[missed_alarm_filter | valid_filter]
+                    df = df[valid_filter]
 
                 table_data = ((df.sort_values(by='processed_at',ascending = False )).reset_index()).head(limit_rows) 
 
