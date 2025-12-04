@@ -141,7 +141,7 @@ def get_avg_max_risk(data, prev_day_filter, all_filter):
     return max_risk, avg, avg_perc, curr_high_risk_sum, high_risk_perc
 
 def categorize(row):
-    if row["fraud"] == 1:
+    if row["fraud"] == 1 and row["prediction"] == 1:
         return "Fraud"
     elif row["fraud"] == 0 and row["prediction"] == 1:
         return "False Alarms"
@@ -510,7 +510,7 @@ with T2:
                 if filter_trans == "Show All" or filter_trans == "All":
                     df = df[all_filter]
                 elif filter_trans == "Fraud":
-                    df = df[missed_alarm_filter | false_alarm_filter | fraud_filter]
+                    df = df[ missed_alarm_filter| false_alarm_filter | fraud_filter]
                 else:
                     df = df[valid_filter]
 
