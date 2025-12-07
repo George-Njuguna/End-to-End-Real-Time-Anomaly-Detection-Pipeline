@@ -314,12 +314,12 @@ with T1:
 
         elif filter_trans == "Fraud":
             df_melted = df_hourly[["processed_at", "Fraud"]].rename(columns={"Fraud": "amount"})
-            labels = ["Fraud", "Missed Alarms"]
+            labels = ["Fraud", "Missed Alarms", "False Alarms"]
             values = [fraud_sum, missed_alarm_sum]
 
         else:  # Valid
             df_melted = df_hourly[["processed_at", "Valid"]].rename(columns={"Valid": "amount"})
-            labels = ["Valid", "False Alarms"]
+            labels = ["Valid"]
             values = [valid_sum, false_alarm_sum]
         
          # line Chart
