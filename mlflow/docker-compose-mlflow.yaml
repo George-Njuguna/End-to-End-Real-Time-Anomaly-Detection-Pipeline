@@ -1,6 +1,7 @@
 volumes:
   pgdata:
   minio-data:
+  mlflow-artifacts:
 
 services:
   mlflow_postgres:
@@ -86,6 +87,8 @@ services:
       MLFLOW_SERVER_ALLOWED_HOSTS: "mlflow,localhost,127.0.0.1,*"
     networks:
       - fraud_network
+    volumes:
+      - mlflow-artifacts:/mlflow_artifacts
 
     command: >
       /bin/bash -c "
@@ -114,3 +117,4 @@ services:
 networks:
   fraud_network:
     external: true
+

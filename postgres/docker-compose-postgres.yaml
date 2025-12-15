@@ -11,6 +11,8 @@ services:
     networks:
       - fraud_network
     restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   pgadmin:
     container_name: pgadmin
@@ -23,7 +25,13 @@ services:
     networks:
       - fraud_network
     restart: always
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
 
 networks:
   fraud_network:
     external: true   
+
+volumes:
+  postgres_data:
+  pgadmin_data:
