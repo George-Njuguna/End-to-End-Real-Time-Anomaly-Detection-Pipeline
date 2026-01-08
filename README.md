@@ -1,5 +1,5 @@
 ## Fraud Detection Pipeline — End-to-End Machine Learning System
-
+![alt text](Fraud.png)
 This repository contains a fully containerized, production-style Fraud Detection Pipeline built with modern data engineering and machine learning tools. The system ingests daily transaction data, processes it through Kafka, performs fraud inference using an MLflow-stored model, retrains the model weekly through Airflow, and serves interactive analytics via a Streamlit dashboard. All components run inside Docker containers connected through a shared Docker network.
 
 #### 📌 Project Overview
