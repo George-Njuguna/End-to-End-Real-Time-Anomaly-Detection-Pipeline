@@ -2,7 +2,6 @@
 *.csv
 *.txt
 *.zip
-*.png
 mlruns
 mlartifacts
 
